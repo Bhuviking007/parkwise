@@ -76,3 +76,30 @@
 .parking-card-actions a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;white-space:nowrap}
 .parking-disclaimer{margin-top:10px;font-size:11px}
 @media(max-width:760px){.parking-location-tools{grid-template-columns:1fr}.parking-card-actions{justify-content:flex-start}.parking-card-actions .primary-btn,.parking-card-actions .secondary-btn{min-height:38px}}
+
+/* Account and role preview */
+.role-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.role-card{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--panel)}
+.role-card h3{margin:10px 0 7px;font-size:15px}.role-card p{font-size:12px;line-height:1.6;color:var(--muted);min-height:76px}
+.role-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--soft);font-size:20px}
+.permission-list{display:grid;gap:10px}.permission-item{display:flex;gap:10px;align-items:flex-start;border-bottom:1px solid var(--line);padding:0 0 10px;font-size:13px}.permission-item:last-child{border-bottom:0}.permission-check{color:#43a778;font-weight:800}
+.role-status{margin-top:10px;color:var(--muted);font-size:12px}
+@media(max-width:1000px){.role-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.role-grid{grid-template-columns:1fr}.role-card p{min-height:0}}
+
+/* Secure account UI (Supabase Auth) */
+.auth-shell{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 16px;gap:22px}
+.auth-brand{align-self:center;text-decoration:none}
+.auth-card{width:min(100%,440px);border:1px solid var(--line);border-radius:20px;padding:28px;background:var(--panel);box-shadow:0 24px 70px #00000020}
+.auth-card h1{font-size:30px;letter-spacing:-1px;margin:10px 0 8px}.auth-sub{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 20px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;padding:4px;background:var(--soft);border-radius:12px;gap:4px;margin-bottom:22px}
+.auth-tab{border:0;background:transparent;border-radius:9px;padding:11px;color:var(--muted);font:600 13px 'DM Sans',sans-serif;cursor:pointer}
+.auth-tab.active{background:var(--panel);color:var(--text);box-shadow:0 2px 8px #0000000d}
+.auth-card .field{margin-bottom:16px}.auth-card .field input{width:100%;box-sizing:border-box}
+.auth-help{font-size:11px;color:var(--muted);margin-top:6px}.auth-submit{width:100%;justify-content:center;margin-top:5px}
+.auth-message{font-size:12px;line-height:1.6;color:var(--accent,#3c9b6c);margin-top:14px}.auth-message.error{color:#e06b62}
+.auth-security{display:flex;gap:10px;align-items:flex-start;background:var(--soft);padding:12px;border-radius:12px;font-size:11px;line-height:1.6;color:var(--muted);margin-top:18px}
+.auth-back{font-size:12px;margin:18px 0 0}.auth-back a,.auth-setup-link{color:var(--accent,#3c9b6c);text-decoration:none}
+.auth-footnote{max-width:440px;text-align:center;font-size:11px;line-height:1.6;color:var(--muted)}
+.auth-setup-link{display:inline-block;margin-top:12px;font-size:13px}
+#parkwiseSignOut{white-space:nowrap}
+@media(max-width:520px){.auth-card{padding:22px}.auth-card h1{font-size:25px}}

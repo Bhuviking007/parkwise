@@ -43,3 +43,30 @@ The browser-only Overpass calls can fail with `Failed to fetch` because of CORS 
 Requirements: Python 3 installed and available as `py` in Command Prompt. No extra Python packages are needed. Do not open the HTML file directly and do not start `python -m http.server`; use `run-local.bat`.
 
 If the app still reports that all data endpoints failed, the local proxy is running but your computer/network cannot reach the providers, or the providers are temporarily unavailable. The detailed provider errors should appear in the message. The app's geocoding still uses Photon/Nominatim in the browser. OpenStreetMap coverage may be incomplete and mapped parking does not indicate live occupancy.
+
+
+## Accounts and roles (prototype)
+`accounts.html` adds a role-preview screen for Citizen, Parking Operator, Traffic Officer, and Administrator. The selected profile is stored in browser localStorage and controls page visibility in the front-end. This is a UI demo only, NOT real authentication or secure authorization: anyone can change local storage or JavaScript. Do not use it to protect real user data or grant production admin powers. For production, add a trusted authentication provider and server-side role checks (for example, Supabase Auth + Postgres row-level security) before enabling real reservations or enforcement workflows.
+
+
+## Sign-up and login (Supabase Auth)
+This project now includes `auth.html`, `auth.js`, and `auth-config.js` for email/password sign-up, sign-in, session persistence, and sign-out using Supabase Auth. Supabase handles password hashing and the authentication endpoints use HTTPS; Parkwise does not store raw passwords.
+
+### Enable it
+1. Create a project at https://supabase.com/dashboard.
+2. In Project Settings → API, copy the Project URL and the publishable key (or legacy anon key).
+3. Edit `auth-config.js`: replace `YOUR_SUPABASE_PROJECT_URL` and `YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY` with those public values. Never use a `service_role` or secret key in browser code.
+4. In Supabase Authentication → URL Configuration, set the Site URL to `https://parkwise-pranav.netlify.app` and add `https://parkwise-pranav.netlify.app/auth.html` to Redirect URLs. For local testing, also allow `http://127.0.0.1:8000/auth.html`.
+5. Commit and push the files to GitHub; Netlify should redeploy. Then open `/auth.html` and create an account. If email confirmation is enabled, follow the confirmation email first.
+
+### Security scope
+This enables real identity authentication and redirects unauthenticated browsers to the sign-in page once Supabase is configured. Browser-side route guarding is not a substitute for server-side authorization. The current demo parking, reservation, report, and role-preview data is still browser-side; do not treat local role selection or localStorage as trusted permissions. Before using real records, add a database and Row Level Security (RLS) policies; assign operator/officer/admin roles only from a trusted server-side process. Keep the Supabase publishable/anon key public as intended, but never publish secret/service-role keys.
+
+
+## Test Administrator login (manual sign-in; no auto-login)
+- Username alias: `Bhuviking007`
+- Account email: `bkgaming208@gmail.com`
+- Display role: `Test Administrator` only when the authenticated Supabase user's trusted `app_metadata.role` is set to `test_administrator`.
+- The login form accepts either the username alias or the email address. It does **not** create the hosted account or bypass the password. No password is embedded in the public source code.
+- Create this user once in Supabase Dashboard → Authentication → Users → Add user, then assign the trusted app metadata role through an admin-only process. The user remains in Supabase across code/ZIP updates; you do not need to sign up again after each update.
+- Keep the password private and unique. Never put a Supabase service-role/secret key in frontend files. A displayed role is not sufficient authorization: enforce privileged actions server-side and with database RLS.
