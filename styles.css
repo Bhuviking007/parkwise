@@ -152,3 +152,31 @@
   .reports-layout .panel-head h3 { overflow-wrap: anywhere; }
   .reports-layout .primary-btn { width: 100%; white-space: normal; }
 }
+
+
+/* Desktop sidebar: keep the profile and city card reachable by scrolling the sidebar. */
+@media (min-width: 901px) {
+  .sidebar {
+    height: 100vh;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-self: start;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #60776a transparent;
+  }
+  .sidebar::-webkit-scrollbar { width: 7px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb {
+    background: #60776a;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  .side-bottom {
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+  .profile { padding-bottom: 8px; }
+}
