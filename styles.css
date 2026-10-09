@@ -180,3 +180,50 @@
   }
   .profile { padding-bottom: 8px; }
 }
+
+
+/* Map app selector contrast fix for the dark theme. */
+:root[data-theme="dark"] .map-provider-row {
+  background: var(--panel, #17251f);
+  color: var(--text, #edf4ef);
+  border-color: var(--line, #34473d);
+}
+:root[data-theme="dark"] .map-provider-row label {
+  color: var(--text, #edf4ef);
+}
+:root[data-theme="dark"] .map-provider-row .sub {
+  color: var(--muted, #a8b7ae);
+}
+:root[data-theme="dark"] .map-provider-select {
+  background: #17251f;
+  color: #edf4ef;
+  border-color: #40564a;
+}
+:root[data-theme="dark"] .map-provider-select option {
+  background: #17251f;
+  color: #edf4ef;
+}
+
+
+/* Definitive map-app theme fix: use the site's actual theme tokens. */
+.map-provider-row {
+  background: var(--white, #fff) !important;
+  color: var(--ink, #17251f) !important;
+  border-color: var(--line, #e4e8df) !important;
+}
+.map-provider-row label,
+.map-provider-row label strong {
+  color: var(--ink, #17251f) !important;
+}
+.map-provider-row .sub {
+  color: var(--muted, #75817b) !important;
+}
+.map-provider-select {
+  background: var(--white, #fff) !important;
+  color: var(--ink, #17251f) !important;
+  border-color: var(--line, #e4e8df) !important;
+}
+.map-provider-select option {
+  background: var(--white, #fff);
+  color: var(--ink, #17251f);
+}
