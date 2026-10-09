@@ -227,3 +227,33 @@
   background: var(--white, #fff);
   color: var(--ink, #17251f);
 }
+
+
+/* Native select dropdown: align popup option colors with the active theme.
+   The open popup is rendered by the browser/OS, so use color-scheme as well. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] .map-provider-select {
+  color-scheme: dark;
+  background-color: #19251e !important;
+  color: #e8efe9 !important;
+  border-color: #2b3a30 !important;
+}
+:root[data-theme="dark"] .map-provider-select option {
+  background-color: #19251e !important;
+  color: #e8efe9 !important;
+}
+:root[data-theme="light"] .map-provider-select {
+  color-scheme: light;
+  background-color: #fff !important;
+  color: #17251f !important;
+}
+:root[data-theme="light"] .map-provider-select option {
+  background-color: #fff !important;
+  color: #17251f !important;
+}
