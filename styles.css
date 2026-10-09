@@ -103,3 +103,52 @@
 .auth-setup-link{display:inline-block;margin-top:12px;font-size:13px}
 #parkwiseSignOut{white-space:nowrap}
 @media(max-width:520px){.auth-card{padding:22px}.auth-card h1{font-size:25px}}
+
+
+/* Mobile fix: citizen report form and feed must stack instead of overlap. */
+.reports-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(0, .9fr);
+  align-items: start;
+}
+.reports-layout > .panel {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.reports-layout .panel-head {
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.reports-layout .form-stack,
+.reports-layout .field,
+.reports-layout input,
+.reports-layout select,
+.reports-layout textarea {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.reports-layout .form-row {
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .reports-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px;
+    width: 100%;
+  }
+  .reports-layout > .panel {
+    grid-column: 1 / -1;
+  }
+  .reports-layout .form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 420px) {
+  .main { min-width: 0; }
+  .reports-layout .panel { padding: 16px; }
+  .reports-layout .panel-head h3 { overflow-wrap: anywhere; }
+  .reports-layout .primary-btn { width: 100%; white-space: normal; }
+}
