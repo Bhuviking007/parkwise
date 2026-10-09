@@ -12,3 +12,7 @@ PARKWISE NETLIFY AUTH SETUP (NO SUPABASE)
 
 Secrets must be set in Netlify, never in frontend JS or committed files.
 This ZIP's auth system uses Netlify Functions + Netlify Blobs; no Supabase is used.
+
+
+## Hardcoded demo admin (requested)
+The Netlify Function contains a demo admin username/email/password and a session-signing secret, so the demo can be tested without setting those environment variables. Login is still manual. These values are inside server-side Function code, not frontend browser JS. However, if the GitHub repository is public, anyone can read the credentials and signing secret from the source. This is demo-only and must not be used for real admin data or production privileges. Change them before public use.

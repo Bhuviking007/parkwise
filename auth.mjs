@@ -5,6 +5,14 @@ const enc = new TextEncoder();
 const COOKIE = "parkwise_session";
 const WEEK = 7 * 24 * 60 * 60;
 
+// Hardcoded fallback configuration for the Parkwise demo.
+// IMPORTANT: This file is server-side Netlify Function code, never import it in frontend JS.
+// Do not use these demo credentials for a real production administrator account.
+const ADMIN_USERNAME = "Bhuviking007";
+const ADMIN_EMAIL = "bkgaming208@gmail.com";
+const ADMIN_PASSWORD = "Bhuviking007";
+const SESSION_SECRET = "parkwise-demo-session-secret-change-before-production-2026-10-09-8f1d2c7a";
+
 function json(statusCode, body, headers = {}) {
   return new Response(JSON.stringify(body), { status: statusCode, headers: {
     "content-type": "application/json; charset=utf-8",
@@ -44,9 +52,7 @@ async function verifyPassword(password, stored) {
   } catch { return false; }
 }
 async function hmacKey() {
-  const secret = Netlify.env.get("PARKWISE_SESSION_SECRET");
-  if (!secret || secret.length < 32) throw new Error("Set PARKWISE_SESSION_SECRET to a random secret of at least 32 characters.");
-  return crypto.subtle.importKey("raw", enc.encode(secret), {name:"HMAC",hash:"SHA-256"}, false, ["sign","verify"]);
+  return crypto.subtle.importKey("raw", enc.encode(SESSION_SECRET), {name:"HMAC",hash:"SHA-256"}, false, ["sign","verify"]);
 }
 async function makeSession(user) {
   const payload = b64u(enc.encode(JSON.stringify({u:user.username,e:user.email,r:user.role,x:Math.floor(Date.now()/1000)+WEEK})));
@@ -123,9 +129,9 @@ export default async (request) => {
     try {
       let user=await lookup(identifier);
       // One-time server-side bootstrap for the Test Administrator; credentials are only in private environment variables.
-      const adminUser=Netlify.env.get("PARKWISE_ADMIN_USERNAME") || "Bhuviking007";
-      const adminEmail=Netlify.env.get("PARKWISE_ADMIN_EMAIL") || "bkgaming208@gmail.com";
-      const adminPassword=Netlify.env.get("PARKWISE_ADMIN_PASSWORD") || "";
+      const adminUser = ADMIN_USERNAME;
+      const adminEmail = ADMIN_EMAIL;
+      const adminPassword = ADMIN_PASSWORD;
       if (!user && adminPassword && password === adminPassword &&
           [norm(adminUser),norm(adminEmail)].includes(norm(identifier))) {
         const byName=await store.get(`user:${norm(adminUser)}`,{type:"json"});
@@ -135,7 +141,27 @@ export default async (request) => {
           await saveUser(user);
         } else user=await lookup(identifier);
       }
+      if (!user && password === ADMIN_PASSWORD &&
+          [norm(ADMIN_USERNAME), norm(ADMIN_EMAIL)].includes(norm(identifier))) {
+        const byName = await store.get(`user:${norm(ADMIN_USERNAME)}`, {type:"json"});
+        const byEmail = await store.get(`email:${norm(ADMIN_EMAIL)}`, {type:"text"});
+        if (!byName && !byEmail) {
+          user = {username:ADMIN_USERNAME,email:ADMIN_EMAIL,passwordHash:await passwordHash(ADMIN_PASSWORD),role:"test_administrator",createdAt:new Date().toISOString()};
+          await saveUser(user);
+        } else {
+          user = await lookup(identifier);
+          if (user && password === ADMIN_PASSWORD) {
+            user.role = "test_administrator";
+            await saveUser(user);
+          }
+        }
+      }
       if (!user || !await verifyPassword(password,user.passwordHash)) return json(401,{error:"Invalid username/email or password."});
+      // Keep the seeded demo admin role on the server-side record.
+      if ([norm(ADMIN_USERNAME), norm(ADMIN_EMAIL)].includes(norm(identifier)) && password === ADMIN_PASSWORD && user.role !== "test_administrator") {
+        user.role = "test_administrator";
+        await saveUser(user);
+      }
       const token=await makeSession(user);
       return json(200,{ok:true,user:publicUser(user)},{ "set-cookie":cookie(token,WEEK) });
     } catch(e) { return json(503,{error:"Authentication is not configured. Check Netlify Blobs and environment variables."}); }

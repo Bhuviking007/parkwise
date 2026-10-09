@@ -118,3 +118,7 @@ A JavaScript object encrypted in frontend code is not a safe account database: u
 
 ## Optional login behavior
 Public Parkwise pages do not redirect visitors to the login screen. Visitors can browse without an account and open `auth.html` only when they choose to sign in or create an account. No automatic login is performed.
+
+
+## Hardcoded demo admin (requested)
+The Netlify Function contains a demo admin username/email/password and a session-signing secret, so the demo can be tested without setting those environment variables. Login is still manual. These values are inside server-side Function code, not frontend browser JS. However, if the GitHub repository is public, anyone can read the credentials and signing secret from the source. This is demo-only and must not be used for real admin data or production privileges. Change them before public use.
