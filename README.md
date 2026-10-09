@@ -70,3 +70,25 @@ This enables real identity authentication and redirects unauthenticated browsers
 - The login form accepts either the username alias or the email address. It does **not** create the hosted account or bypass the password. No password is embedded in the public source code.
 - Create this user once in Supabase Dashboard → Authentication → Users → Add user, then assign the trusted app metadata role through an admin-only process. The user remains in Supabase across code/ZIP updates; you do not need to sign up again after each update.
 - Keep the password private and unique. Never put a Supabase service-role/secret key in frontend files. A displayed role is not sufficient authorization: enforce privileged actions server-side and with database RLS.
+
+
+## Server-side accounts (no Supabase)
+
+Parkwise now uses its own Python server and SQLite database for account creation, password verification, and sessions. No Supabase account or API key is required. Do not open the HTML files directly; start the server and browse to `http://127.0.0.1:8000/auth.html`.
+
+### Create the initial Test Administrator once
+
+The account identity defaults to username `Bhuviking007` and email `bkgaming208@gmail.com`. Set the password as a server environment variable before the first launch. The password is never stored in source code; only a salted scrypt password hash is stored in SQLite. Example in PowerShell:
+
+```powershell
+$env:PARKWISE_ADMIN_PASSWORD = Read-Host "Set the Test Administrator password"
+py server.py
+```
+
+Run that from the `parkwise-multipage` folder. Use a strong unique password (10+ characters). The account is seeded once in `parkwise.sqlite3`; subsequent source updates do not require signup again as long as you preserve the database file and persistent disk. If you want the exact same password as an earlier demo, set it only in your private server environment—not in a committed file.
+
+Optional environment variables: `PARKWISE_ADMIN_USERNAME`, `PARKWISE_ADMIN_EMAIL`, `PARKWISE_DB_PATH`, `HOST`, and `PORT`. The role is assigned during trusted server-side seeding, not from browser form input. Citizen signup cannot self-assign administrator role.
+
+### Deployment note
+
+This is a server-backed app, not a static-only Netlify site. Netlify static hosting cannot run this Python server or preserve its SQLite database by itself. Deploy `server.py` to a Python-capable host with persistent storage, set `PARKWISE_ADMIN_PASSWORD` in that host's environment settings, and point the domain to that service. Use HTTPS in production. SQLite is suitable for a small demo; for a larger multi-instance production deployment, use a managed database and add rate limiting, CSRF protection, backups, and account recovery.
