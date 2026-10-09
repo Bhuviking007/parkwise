@@ -3,7 +3,7 @@
   const onAuthPage = document.body?.dataset?.page === 'auth';
   const say = (message, error=false) => { const el=$('authMessage'); if(el){el.textContent=message;el.classList.toggle('error',error);} };
   async function api(path, body) {
-    const res = await fetch('/api/auth/' + path, {method: body ? 'POST' : 'GET', headers: body ? {'Content-Type':'application/json'} : {}, body: body ? JSON.stringify(body) : undefined, credentials:'same-origin'});
+    const res = await fetch('/.netlify/functions/auth?action=' + encodeURIComponent(path), {method: body ? 'POST' : 'GET', headers: body ? {'Content-Type':'application/json'} : {}, body: body ? JSON.stringify(body) : undefined, credentials:'same-origin'});
     const data = await res.json().catch(()=>({error:'Unexpected server response.'}));
     if(!res.ok) throw new Error(data.error || 'Request failed.'); return data;
   }
@@ -14,7 +14,7 @@
     $('loginTab')?.addEventListener('click',()=>setMode('login'));$('signupTab')?.addEventListener('click',()=>setMode('signup'));
     // Login is optional. Visiting auth.html is the user's explicit choice to sign in.
     try { await api('me'); } catch(e) {
-      say('Authentication service is currently unavailable. You can still browse Parkwise; sign-in features will work when the server is available.', true);
+      say('Parkwise sign-in service could not be reached. Redeploy the Netlify Functions and ensure Netlify Blobs is enabled. You can still browse without signing in.', true);
     }
     form.addEventListener('submit',async e=>{e.preventDefault();const identifier=$('email').value.trim(),password=$('password').value,name=$('fullName')?.value.trim()||'';const btn=$('authSubmit');btn.disabled=true;btn.textContent=mode==='login'?'Signing in…':'Creating account…';say('');try{if(mode==='signup'){await api('signup',{identifier,password,name});say('Account created. You can now sign in.');setMode('login');$('email').value=identifier;}else{await api('login',{identifier,password});location.replace('index.html');}}catch(err){say(err.message||'Authentication failed.',true);}finally{btn.disabled=false;btn.textContent=mode==='login'?'Sign in':'Create account';}});
   }
