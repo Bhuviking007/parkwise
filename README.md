@@ -114,3 +114,7 @@ Netlify must deploy this repository as a site with Functions enabled. If your ex
 ### Security notes
 
 A JavaScript object encrypted in frontend code is not a safe account database: users can inspect shipped code and recover embedded keys. This implementation keeps account records and secrets server-side. For production, add rate limiting, account recovery/email verification, and audit the authorization checks on every sensitive API. Netlify Blobs is persistent storage, but this lightweight account index is best suited to a demo rather than high-concurrency enterprise auth.
+
+
+## Optional login behavior
+Public Parkwise pages do not redirect visitors to the login screen. Visitors can browse without an account and open `auth.html` only when they choose to sign in or create an account. No automatic login is performed.
