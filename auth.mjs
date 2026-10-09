@@ -72,7 +72,37 @@ async function readSession(request) {
     return user ? publicUser(user) : null;
   } catch { return null; }
 }
-function publicUser(u) { return {username:u.username,email:u.email,role:u.role}; }
+function publicUser(u) { return {username:u.username,email:u.email,role:u.role,userId:u.userId || null}; }
+function isRoleManager(user) { return !!user && (user.role === "admin" || user.role === "administrator" || user.role === "test_administrator"); }
+async function ensureUserId(user) {
+  if (user.userId && /^\d{12}$/.test(user.userId)) return user;
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const id = String(crypto.getRandomValues(new Uint32Array(1))[0] % 900000000000 + 100000000000);
+    const existing = await store.get(`user-id:${id}`, {type:"text"});
+    if (!existing) {
+      user.userId = id;
+      await store.set(`user-id:${id}`, user.username);
+      await saveUser(user);
+      return user;
+    }
+  }
+  throw new Error("Could not allocate a unique user ID.");
+}
+async function allUsers() {
+  const found = [];
+  let cursor;
+  do {
+    const page = await store.list({prefix:"user:", cursor, limit:1000});
+    for (const blob of (page.blobs || [])) {
+      const key = blob.key;
+      if (!key || key.startsWith("user-id:")) continue;
+      const u = await store.get(key, {type:"json"});
+      if (u && u.username && u.email) found.push(await ensureUserId(u));
+    }
+    cursor = page.cursor;
+  } while (cursor);
+  return found;
+}
 function cookie(value, maxAge) {
   const secure = (globalThis.Netlify?.env?.get?.("CONTEXT") === "production" || globalThis.process?.env?.CONTEXT === "production") ? "; Secure" : "";
   return `${COOKIE}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure}`;
@@ -95,13 +125,37 @@ export default async (request) => {
   if (request.method === "OPTIONS") return new Response(null, {status:204,headers:{"allow":"GET, POST, OPTIONS"}});
   const url = new URL(request.url);
   const action = url.searchParams.get("action") || (request.method === "GET" ? "me" : "");
-  if (!["me","login","signup","logout"].includes(action)) return json(404,{error:"Unknown authentication action."});
-  if (request.method !== (action === "me" ? "GET" : "POST")) return json(405,{error:"Method not allowed."},{allow:action==="me"?"GET":"POST"});
+  if (!["me","login","signup","logout","users","set-role"].includes(action)) return json(404,{error:"Unknown authentication action."});
+  if (request.method !== (["me","users"].includes(action) ? "GET" : "POST")) return json(405,{error:"Method not allowed."},{allow:action==="me"?"GET":"POST"});
   if (action === "me") {
-    try { const user=await readSession(request); return json(200,{authenticated:!!user,user}); }
+    try { let user=await readSession(request); if (user) { const stored=await store.get(`user:${norm(user.username)}`,{type:"json"}); if(stored) user=publicUser(await ensureUserId(stored)); } return json(200,{authenticated:!!user,user}); }
     catch(e) { return json(503,{error:"Authentication service is not configured. Check Netlify environment variables."}); }
   }
   if (action === "logout") return json(200,{ok:true},{ "set-cookie":cookie("",0) });
+  if (action === "users" || action === "set-role") {
+    try {
+      const session = await readSession(request);
+      if (!session) return json(401,{error:"Sign in to manage accounts."});
+      const storedActor = await store.get(`user:${norm(session.username)}`,{type:"json"});
+      if (!isRoleManager(storedActor)) return json(403,{error:"Only Administrators and the Test Administrator can change account roles."});
+      if (action === "users") return json(200,{users:(await allUsers()).map(publicUser)});
+      let body; try { body=await request.json(); } catch { return json(400,{error:"Invalid request."}); }
+      const userId=String(body?.userId||"");
+      const role=String(body?.role||"");
+      const allowedRoles=["citizen","operator","officer","admin"];
+      if (!/^\d{12}$/.test(userId) || !allowedRoles.includes(role)) return json(400,{error:"Choose a valid user ID and role."});
+      const owner=await store.get(`user-id:${userId}`,{type:"text"});
+      if (!owner) return json(404,{error:"User ID not found."});
+      const target=await store.get(`user:${norm(owner)}`,{type:"json"});
+      if (!target) return json(404,{error:"User account not found."});
+      if (target.role === "test_administrator") return json(403,{error:"The Test Administrator role cannot be changed here."});
+      target.role=role;
+      target.roleUpdatedAt=new Date().toISOString();
+      target.roleUpdatedBy=storedActor.username;
+      await saveUser(target);
+      return json(200,{ok:true,user:publicUser(await ensureUserId(target))});
+    } catch(e) { return json(503,{error:"Account directory is unavailable. Check Netlify Blobs and function logs."}); }
+  }
   let body;
   try { body=await request.json(); } catch { return json(400,{error:"Invalid request."}); }
   if (!body || typeof body !== "object") return json(400,{error:"Invalid request."});
@@ -118,6 +172,7 @@ export default async (request) => {
       let username=local, n=1;
       while (await store.get(`user:${norm(username)}`,{type:"json"})) username=`${local.slice(0,25)}${++n}`;
       const user={username,email,passwordHash:await passwordHash(password),role:"citizen",createdAt:new Date().toISOString()};
+      await ensureUserId(user);
       await saveUser(user);
       return json(201,{ok:true,message:"Account created. You can now sign in."});
     } catch(e) { return json(503,{error:"Account storage is not ready. Enable Netlify Blobs and redeploy."}); }
@@ -138,6 +193,7 @@ export default async (request) => {
         const byEmail=await store.get(`email:${norm(adminEmail)}`,{type:"text"});
         if (!byName && !byEmail) {
           user={username:adminUser,email:adminEmail,passwordHash:await passwordHash(adminPassword),role:"test_administrator",createdAt:new Date().toISOString()};
+          await ensureUserId(user);
           await saveUser(user);
         } else user=await lookup(identifier);
       }
@@ -147,6 +203,7 @@ export default async (request) => {
         const byEmail = await store.get(`email:${norm(ADMIN_EMAIL)}`, {type:"text"});
         if (!byName && !byEmail) {
           user = {username:ADMIN_USERNAME,email:ADMIN_EMAIL,passwordHash:await passwordHash(ADMIN_PASSWORD),role:"test_administrator",createdAt:new Date().toISOString()};
+          await ensureUserId(user);
           await saveUser(user);
         } else {
           user = await lookup(identifier);
@@ -157,6 +214,7 @@ export default async (request) => {
         }
       }
       if (!user || !await verifyPassword(password,user.passwordHash)) return json(401,{error:"Invalid username/email or password."});
+      user = await ensureUserId(user);
       // Keep the seeded demo admin role on the server-side record.
       if ([norm(ADMIN_USERNAME), norm(ADMIN_EMAIL)].includes(norm(identifier)) && password === ADMIN_PASSWORD && user.role !== "test_administrator") {
         user.role = "test_administrator";
