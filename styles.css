@@ -257,3 +257,71 @@
   background-color: #fff !important;
   color: #17251f !important;
 }
+
+
+/* Mobile layout and navigation fixes for Accounts & Roles and Settings */
+@media (max-width: 720px) {
+  body[data-page="accounts"] .dashboard-grid,
+  body[data-page="settings"] .dashboard-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+    min-width: 0;
+  }
+  body[data-page="accounts"] .dashboard-grid > .panel,
+  body[data-page="settings"] .dashboard-grid > .panel {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin-top: 0 !important;
+    grid-column: 1 / -1;
+  }
+  body[data-page="accounts"] #accountDirectoryPanel {
+    overflow: hidden;
+  }
+  body[data-page="accounts"] #accountDirectoryPanel > div[style*="overflow-x:auto"] {
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+  body[data-page="accounts"] #accountIdentity,
+  body[data-page="accounts"] .hint,
+  body[data-page="settings"] .mini-stat,
+  body[data-page="settings"] .toggle-line {
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+  body[data-page="accounts"] .field input,
+  body[data-page="settings"] input,
+  body[data-page="settings"] select,
+  body[data-page="settings"] textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  body[data-page="accounts"] .role-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  body[data-page="accounts"] .topbar,
+  body[data-page="settings"] .topbar {
+    min-width: 0;
+  }
+  body[data-page="accounts"] .topbar > div:first-child,
+  body[data-page="settings"] .topbar > div:first-child {
+    min-width: 0;
+  }
+}
+@media (max-width: 720px) {
+  .sidebar { z-index: 1001; }
+  .mobile-menu { position: relative; z-index: 1002; flex: 0 0 auto; touch-action: manipulation; }
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,.48);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  .sidebar-backdrop.visible { opacity: 1; pointer-events: auto; }
+  body.menu-open { overflow: hidden; }
+}
