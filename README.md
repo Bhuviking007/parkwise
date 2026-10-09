@@ -92,3 +92,25 @@ Optional environment variables: `PARKWISE_ADMIN_USERNAME`, `PARKWISE_ADMIN_EMAIL
 ### Deployment note
 
 This is a server-backed app, not a static-only Netlify site. Netlify static hosting cannot run this Python server or preserve its SQLite database by itself. Deploy `server.py` to a Python-capable host with persistent storage, set `PARKWISE_ADMIN_PASSWORD` in that host's environment settings, and point the domain to that service. Use HTTPS in production. SQLite is suitable for a small demo; for a larger multi-instance production deployment, use a managed database and add rate limiting, CSRF protection, backups, and account recovery.
+
+
+## Netlify JavaScript authentication (no Supabase)
+
+This version uses a Netlify Function (`netlify/functions/auth.mjs`) and Netlify Blobs for persistent account records. Passwords are stored as PBKDF2 hashes, and sessions use an HttpOnly, signed cookie. The account dictionary and password hashes are held server-side—not in browser JavaScript.
+
+### Configure once in Netlify
+
+In **Site configuration → Environment variables**, add:
+
+- `PARKWISE_SESSION_SECRET`: a randomly generated secret with at least 32 characters.
+- `PARKWISE_ADMIN_PASSWORD`: a strong, unique password for the Test Administrator.
+- `PARKWISE_ADMIN_USERNAME`: `Bhuviking007` (optional; this is the default).
+- `PARKWISE_ADMIN_EMAIL`: `bkgaming208@gmail.com` (optional; this is the default).
+
+Never put these values in a committed JavaScript file. Redeploy after setting variables. The Test Administrator record is bootstrapped server-side at first successful admin login; it is not automatically logged in. General users can sign up from the login screen. Netlify Blobs must be available for the site.
+
+Netlify must deploy this repository as a site with Functions enabled. If your existing deployment uses a different publish directory/build command, merge the `netlify.toml` settings with your existing build settings rather than overwriting unrelated settings. The redirect maps `/api/auth/me`, `/api/auth/login`, `/api/auth/signup`, and `/api/auth/logout` to the server-side function.
+
+### Security notes
+
+A JavaScript object encrypted in frontend code is not a safe account database: users can inspect shipped code and recover embedded keys. This implementation keeps account records and secrets server-side. For production, add rate limiting, account recovery/email verification, and audit the authorization checks on every sensitive API. Netlify Blobs is persistent storage, but this lightweight account index is best suited to a demo rather than high-concurrency enterprise auth.

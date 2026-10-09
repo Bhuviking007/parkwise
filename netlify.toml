@@ -1,0 +1,9 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/auth/*"
+  to = "/.netlify/functions/auth?action=:splat"
+  status = 200
+  force = true

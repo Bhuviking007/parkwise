@@ -1,0 +1,14 @@
+PARKWISE NETLIFY AUTH SETUP (NO SUPABASE)
+
+1. Commit and push this folder to the GitHub repository connected to Netlify.
+2. In Netlify Site configuration > Environment variables, add:
+   PARKWISE_SESSION_SECRET = a random secret of at least 32 characters
+   PARKWISE_ADMIN_PASSWORD = a strong, unique Test Administrator password
+   PARKWISE_ADMIN_USERNAME = Bhuviking007 (optional)
+   PARKWISE_ADMIN_EMAIL = bkgaming208@gmail.com (optional)
+3. Redeploy the site.
+4. Open /auth.html and manually sign in with the admin username/email and the password you set.
+5. Keep Netlify Blobs enabled and do not delete the persistent store.
+
+Secrets must be set in Netlify, never in frontend JS or committed files.
+This ZIP's auth system uses Netlify Functions + Netlify Blobs; no Supabase is used.
