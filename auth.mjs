@@ -74,7 +74,7 @@ async function readSession(request) {
 }
 function publicUser(u) { return {username:u.username,email:u.email,role:u.role}; }
 function cookie(value, maxAge) {
-  const secure = Netlify.env.get("CONTEXT") === "production" ? "; Secure" : "";
+  const secure = (globalThis.Netlify?.env?.get?.("CONTEXT") === "production" || globalThis.process?.env?.CONTEXT === "production") ? "; Secure" : "";
   return `${COOKIE}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure}`;
 }
 async function lookup(identifier) {

@@ -4,8 +4,11 @@
   const say = (message, error=false) => { const el=$('authMessage'); if(el){el.textContent=message;el.classList.toggle('error',error);} };
   async function api(path, body) {
     const res = await fetch('/.netlify/functions/auth?action=' + encodeURIComponent(path), {method: body ? 'POST' : 'GET', headers: body ? {'Content-Type':'application/json'} : {}, body: body ? JSON.stringify(body) : undefined, credentials:'same-origin'});
-    const data = await res.json().catch(()=>({error:'Unexpected server response.'}));
-    if(!res.ok) throw new Error(data.error || 'Request failed.'); return data;
+    const raw = await res.text();
+    let data;
+    try { data = JSON.parse(raw); } catch { data = {error: raw.slice(0,180) || 'Empty response from server.'}; }
+    if(!res.ok) throw new Error(`Auth endpoint returned HTTP ${res.status}: ${data.error || res.statusText || 'Request failed.'}`);
+    return data;
   }
   async function authPageInit(){
     const form=$('authForm'); if(!form)return;
@@ -14,7 +17,7 @@
     $('loginTab')?.addEventListener('click',()=>setMode('login'));$('signupTab')?.addEventListener('click',()=>setMode('signup'));
     // Login is optional. Visiting auth.html is the user's explicit choice to sign in.
     try { await api('me'); } catch(e) {
-      say('Parkwise sign-in service could not be reached. Redeploy the Netlify Functions and ensure Netlify Blobs is enabled. You can still browse without signing in.', true);
+      say(`Parkwise sign-in check failed: ${e.message || 'Could not reach the server.'} If this is a 404, make sure Netlify's publish/base directory is the folder containing netlify.toml and netlify/functions/auth.mjs, then redeploy. If it is a 500/503, open Netlify → Functions → auth → logs. You can still browse without signing in.`, true);
     }
     form.addEventListener('submit',async e=>{e.preventDefault();const identifier=$('email').value.trim(),password=$('password').value,name=$('fullName')?.value.trim()||'';const btn=$('authSubmit');btn.disabled=true;btn.textContent=mode==='login'?'Signing in…':'Creating account…';say('');try{if(mode==='signup'){await api('signup',{identifier,password,name});say('Account created. You can now sign in.');setMode('login');$('email').value=identifier;}else{await api('login',{identifier,password});location.replace('index.html');}}catch(err){say(err.message||'Authentication failed.',true);}finally{btn.disabled=false;btn.textContent=mode==='login'?'Sign in':'Create account';}});
   }
