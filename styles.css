@@ -716,3 +716,66 @@
 .custom-colour-control code{font-size:10px;color:var(--ink);margin-left:auto}
 @media(max-width:520px){.more-theme-palette{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.custom-colour-control{gap:4px}.custom-colour-control span{font-size:9px}}
 @media(max-width:360px){.more-theme-palette{grid-template-columns:minmax(0,1fr)}}
+
+
+/* Dynamic RGB Spectrum theme: the accent hue cycles continuously and UI borders
+   carry a rotating rainbow gradient, inspired by a neon Minecraft UI. */
+@property --parkwise-rgb-hue {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+@keyframes parkwise-rgb-cycle {
+  from { --parkwise-rgb-hue: 0deg; }
+  to { --parkwise-rgb-hue: 360deg; }
+}
+:root[data-accent="rgb"] {
+  --parkwise-rgb-hue: 0deg;
+  animation: parkwise-rgb-cycle 10s linear infinite;
+}
+:root[data-accent="rgb"] .theme-swatch.rgb-theme-swatch {
+  background: conic-gradient(from var(--parkwise-rgb-hue),#ff315a,#ffb62d,#fff34a,#5cff70,#27e4ff,#5575ff,#c454ff,#ff315a) !important;
+}
+:root[data-accent="rgb"] .panel,
+:root[data-accent="rgb"] .stat,
+:root[data-accent="rgb"] .parking-card,
+:root[data-accent="rgb"] .result-card,
+:root[data-accent="rgb"] .online-result,
+:root[data-accent="rgb"] .report-panel,
+:root[data-accent="rgb"] .auth-card,
+:root[data-accent="rgb"] .role-card {
+  border: 1px solid transparent !important;
+  background-image:
+    linear-gradient(var(--surface-raised),var(--surface-raised)),
+    conic-gradient(from var(--parkwise-rgb-hue),#ff315a,#ffb62d,#fff34a,#5cff70,#27e4ff,#5575ff,#c454ff,#ff315a) !important;
+  background-origin: border-box;
+  background-clip: padding-box,border-box;
+  box-shadow: 0 0 0 1px hsl(var(--parkwise-rgb-hue) 70% 55% / .12), 0 8px 24px hsl(var(--parkwise-rgb-hue) 70% 40% / .07);
+}
+:root[data-accent="rgb"] .theme-choice.selected,
+:root[data-accent="rgb"] .surface-style-choice.selected {
+  border: 1px solid transparent !important;
+  background-image:
+    linear-gradient(var(--accent-soft),var(--accent-soft)),
+    conic-gradient(from var(--parkwise-rgb-hue),#ff315a,#ffb62d,#fff34a,#5cff70,#27e4ff,#5575ff,#c454ff,#ff315a) !important;
+  background-origin: border-box;
+  background-clip: padding-box,border-box;
+  box-shadow: 0 0 0 1px hsl(var(--parkwise-rgb-hue) 70% 55% / .16);
+}
+:root[data-accent="rgb"] .nav a:hover,
+:root[data-accent="rgb"] .nav a.active {
+  background: var(--accent-soft) !important;
+  color: var(--accent-ink) !important;
+  outline: 1px solid hsl(var(--parkwise-rgb-hue) 78% 60% / .7);
+}
+:root[data-accent="rgb"] .primary-btn,
+:root[data-accent="rgb"] .welcome-btn,
+:root[data-accent="rgb"] .nav-count {
+  border-color: hsl(var(--parkwise-rgb-hue) 78% 58% / .8) !important;
+}
+.rgb-theme-choice .rgb-theme-swatch {
+  background: conic-gradient(from 0deg,#ff315a,#ffb62d,#fff34a,#5cff70,#27e4ff,#5575ff,#c454ff,#ff315a) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-accent="rgb"] { animation-duration: 60s; }
+}

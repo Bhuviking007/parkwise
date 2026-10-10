@@ -16,7 +16,7 @@ function mixHex(first,second,weight){
   const a=hexToRgb(first),b=hexToRgb(second);
   return rgbHex({r:a.r+(b.r-a.r)*weight,g:a.g+(b.g-a.g)*weight,b:a.b+(b.b-a.b)*weight});
 }
-const PARKWISE_ACCENTS={green:'#28734d',blue:'#2d65bd',purple:'#6841a3',amber:'#966018',rose:'#b72c5d',teal:'#0e8278',cyan:'#087eae',coral:'#b94a37',silver:'#7f8c9f',gold:'#c99a16',charcoal:'#626b7a'};
+const PARKWISE_ACCENTS={green:'#28734d',blue:'#2d65bd',purple:'#6841a3',amber:'#966018',rose:'#b72c5d',teal:'#0e8278',cyan:'#087eae',coral:'#b94a37',silver:'#7f8c9f',gold:'#c99a16',rgb:'#31d6c9'};
 function refreshThemeTokens(accentHex){
   const root=document.documentElement, dark=(root.getAttribute('data-theme')||'dark')==='dark';
   const surfaceStyle=root.getAttribute('data-surface-style')||'tinted';
@@ -29,6 +29,29 @@ function refreshThemeTokens(accentHex){
   const accentText=dark?mixHex(base,'#ffffff',0.52):mixHex(base,'#000000',0.28);
   const buttonColor=dark?mixHex(base,'#000000',0.10):mixHex(base,'#000000',0.22);
   const set=(key,value)=>root.style.setProperty(key,value);
+  const isRGB=root.getAttribute('data-accent')==='rgb';
+  if(isRGB){
+    // The hue is animated by CSS, so the RGB theme remains dynamic without timers.
+    set('--green','hsl(var(--parkwise-rgb-hue) 82% 68%)');
+    set('--green-dark','hsl(var(--parkwise-rgb-hue) 78% 39%)');
+    set('--lime','hsl(var(--parkwise-rgb-hue) 88% 84%)');
+    set('--accent','hsl(var(--parkwise-rgb-hue) 82% 68%)');
+    set('--accent-soft',dark?'hsl(var(--parkwise-rgb-hue) 48% 23%)':'hsl(var(--parkwise-rgb-hue) 65% 92%)');
+    set('--accent-hover',dark?'hsl(var(--parkwise-rgb-hue) 56% 29%)':'hsl(var(--parkwise-rgb-hue) 62% 88%)');
+    set('--accent-ink',dark?'hsl(var(--parkwise-rgb-hue) 86% 82%)':'hsl(var(--parkwise-rgb-hue) 70% 30%)');
+    set('--accent-line','hsl(var(--parkwise-rgb-hue) 78% 58%)');
+    if(surfaceStyle==='neutral'){
+      set('--surface-main',dark?'#111319':'#f5f6f8');set('--surface-raised',dark?'#1c2028':'#ffffff');
+      set('--surface-muted',dark?'#252a34':'#eff1f5');set('--surface-strong',dark?'#2d333e':'#e5e8ee');set('--line',dark?'#343945':'#dfe3e9');
+    }else if(dark){
+      set('--surface-main','hsl(var(--parkwise-rgb-hue) 18% 8%)');set('--surface-raised','hsl(var(--parkwise-rgb-hue) 18% 14%)');
+      set('--surface-muted','hsl(var(--parkwise-rgb-hue) 20% 20%)');set('--surface-strong','hsl(var(--parkwise-rgb-hue) 22% 26%)');set('--line','hsl(var(--parkwise-rgb-hue) 22% 32%)');
+    }else{
+      set('--surface-main','hsl(var(--parkwise-rgb-hue) 32% 97%)');set('--surface-raised','hsl(var(--parkwise-rgb-hue) 22% 99%)');
+      set('--surface-muted','hsl(var(--parkwise-rgb-hue) 30% 92%)');set('--surface-strong','hsl(var(--parkwise-rgb-hue) 32% 87%)');set('--line','hsl(var(--parkwise-rgb-hue) 28% 82%)');
+    }
+    return;
+  }
   set('--green',accentText);set('--green-dark',buttonColor);set('--lime',mixHex(base,'#ffffff',0.77));set('--accent',accentText);
   set('--accent-soft',mixHex(dark?'#111319':'#ffffff',base,dark?0.24:0.12));
   set('--accent-hover',mixHex(dark?'#111319':'#ffffff',base,dark?0.28:0.15));
@@ -88,10 +111,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(themeToggle){themeToggle.checked=current==='dark';themeToggle.addEventListener('change',()=>{applyTheme(themeToggle.checked?'dark':'light');toast(themeToggle.checked?'Dark theme enabled':'Light theme enabled')})}
   document.querySelectorAll('[data-accent-choice]').forEach(button=>button.addEventListener('click',()=>{
     const next=button.dataset.accentChoice;
-    if(next==='charcoal'){
-      if(themeToggle)themeToggle.checked=true;
-      applyTheme('dark');applySurfaceStyle('neutral');
-    }
     applyAccent(next);
     toast(button.querySelector('strong')?.textContent+' selected');
   }));
