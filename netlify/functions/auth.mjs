@@ -163,9 +163,11 @@ export default async (request) => {
   if (action === "signup") {
     const email=norm(body.identifier);
     const password=String(body.password||"");
+    const passwordConfirm=String(body.passwordConfirm||"");
     const display=String(body.name||"").trim().replace(/[^\p{L}\p{N}_. -]/gu,"").slice(0,30);
     if (!validEmail(email)) return json(400,{error:"Use an email address to create an account."});
     if (password.length < 10) return json(400,{error:"Use a password with at least 10 characters."});
+    if (password !== passwordConfirm) return json(400,{error:"Passwords do not match. Please re-enter them."});
     try {
       if (await store.get(`email:${email}`,{type:"text"})) return json(409,{error:"An account with this email already exists. Sign in instead."});
       const local=display || email.split("@")[0];
