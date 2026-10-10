@@ -420,3 +420,229 @@
   .nav-account-links a {padding:11px 13px;}
   .accounts-layout button,.dashboard-grid button,.role-grid button {min-height:42px;touch-action:manipulation;}
 }
+
+/* FINAL THEME TOKENS: neutral surfaces, with the selected colour used only for accents. */
+:root {
+  --ink:#222833;
+  --muted:#687080;
+  --paper:#f5f6f8;
+  --line:#dfe3e9;
+  --white:#ffffff;
+  --surface-main:#f5f6f8;
+  --surface-raised:#ffffff;
+  --surface-muted:#eff1f5;
+  --surface-strong:#e5e8ee;
+  --shadow:0 12px 35px rgba(20,28,40,.055);
+  --accent-soft:#e3f2e8;
+  --accent-hover:#e3f2e8;
+  --accent-ink:#246b49;
+  --accent-line:#c8dfd0;
+}
+:root[data-theme="dark"] {
+  --ink:#edf0f5;
+  --muted:#a7afbd;
+  --paper:#111319;
+  --line:#343945;
+  --white:#1c2028;
+  --surface-main:#111319;
+  --surface-raised:#1c2028;
+  --surface-muted:#252a34;
+  --surface-strong:#2d333e;
+  --shadow:0 12px 35px rgba(0,0,0,.28);
+}
+:root[data-theme="dark"] body {background:var(--surface-main)!important;color:var(--ink)!important}
+:root[data-theme="light"] body {background:var(--surface-main)!important;color:var(--ink)!important}
+
+/* Neutral card, page, sidebar and form surfaces. These overrides intentionally remove
+   the old green-tinted dark backgrounds without removing the chosen accent. */
+:root .sidebar,
+:root .panel,
+:root .stat,
+:root .search,
+:root .icon-btn,
+:root .field input,
+:root .field select,
+:root .field textarea,
+:root .input-search,
+:root input:not([type="checkbox"]):not([type="radio"]),
+:root select,
+:root textarea,
+:root .parking-card,
+:root .result-card,
+:root .online-result,
+:root .report-panel,
+:root .auth-card {
+  background:var(--surface-raised)!important;
+  color:var(--ink);
+  border-color:var(--line)!important;
+}
+:root .city-card,
+:root .mini-stat,
+:root .map-provider-row,
+:root .vehicle-icon {
+  background:var(--surface-muted)!important;
+  color:var(--ink);
+  border-color:var(--line)!important;
+}
+:root .stat-head,
+:root .sub,
+:root .hint,
+:root .page-intro p,
+:root .profile small,
+:root .city-card small,
+:root .footer-note {color:var(--muted)}
+:root .toggle-line,
+:root .parking-row,
+:root td,
+:root th {border-color:var(--line)!important}
+:root .secondary-btn {background:var(--surface-muted)!important;color:var(--accent-ink)!important;border-color:var(--line)!important}
+:root .alert-banner {background:var(--surface-muted)!important;color:var(--ink)!important;border-color:var(--line)!important}
+:root .parking-icon,
+:root .stat-icon,
+:root .stat-icon[style],
+:root .role-icon,
+:root .avatar {
+  background:var(--accent-soft)!important;
+  color:var(--accent-ink)!important;
+  border-color:var(--accent-line)!important;
+}
+:root .nav a:hover,
+:root .nav a.active {background:var(--accent-hover)!important;color:var(--accent-ink)!important}
+:root .primary-btn,
+:root .welcome,
+:root .filter-chip.active {background:var(--green-dark)!important;border-color:var(--green-dark)!important}
+:root .welcome {color:#fff!important}
+:root .welcome p {color:rgba(255,255,255,.84)!important}
+:root .welcome .eyebrow {color:var(--lime)!important}
+:root .brand-mark {background:var(--green-dark)!important;color:#fff!important}
+:root .brand-name span,
+:root .topbar h1 span,
+:root .eyebrow,
+:root .text-btn {color:var(--green)!important}
+:root .primary-btn {color:#fff!important}
+:root .pill:not(.warn):not(.danger):not(.neutral) {background:var(--accent-soft)!important;color:var(--accent-ink)!important}
+:root .positive {color:var(--green)!important}
+:root .toggle {accent-color:var(--green-dark)!important}
+
+/* Complete accent set. Only the accent and soft highlight change; dark cards remain neutral. */
+:root[data-theme="light"][data-accent="green"]{--green:#246b49;--green-dark:#216344;--lime:#d9f3e3;--accent:var(--green);--accent-soft:#e3f2e8;--accent-hover:#e3f2e8;--accent-ink:#246b49;--accent-line:#c8dfd0}
+:root[data-theme="dark"][data-accent="green"]{--green:#92dfb1;--green-dark:#286b49;--lime:#d8f1e2;--accent:var(--green);--accent-soft:#253b30;--accent-hover:#253b30;--accent-ink:#b7ecc9;--accent-line:#3a5545}
+:root[data-theme="light"][data-accent="blue"]{--green:#245bb5;--green-dark:#19458d;--lime:#dbe8ff;--accent:var(--green);--accent-soft:#e7efff;--accent-hover:#e7efff;--accent-ink:#245bb5;--accent-line:#cbdaf8}
+:root[data-theme="dark"][data-accent="blue"]{--green:#91baff;--green-dark:#2d65bd;--lime:#d5e4ff;--accent:var(--green);--accent-soft:#202d43;--accent-hover:#202d43;--accent-ink:#c6dcff;--accent-line:#344b6a}
+:root[data-theme="light"][data-accent="purple"]{--green:#7041a6;--green-dark:#563087;--lime:#eee3ff;--accent:var(--green);--accent-soft:#efe7fc;--accent-hover:#efe7fc;--accent-ink:#7041a6;--accent-line:#ded0f2}
+:root[data-theme="dark"][data-accent="purple"]{--green:#c8a8ff;--green-dark:#6841a3;--lime:#e6d7ff;--accent:var(--green);--accent-soft:#2d263b;--accent-hover:#2d263b;--accent-ink:#e0caff;--accent-line:#4b3764}
+:root[data-theme="light"][data-accent="amber"]{--green:#98600f;--green-dark:#754507;--lime:#ffedc8;--accent:var(--green);--accent-soft:#fff0d4;--accent-hover:#fff0d4;--accent-ink:#754507;--accent-line:#f0d8ad}
+:root[data-theme="dark"][data-accent="amber"]{--green:#ffd08a;--green-dark:#8b591b;--lime:#ffe5bd;--accent:var(--green);--accent-soft:#382e21;--accent-hover:#382e21;--accent-ink:#ffe2b3;--accent-line:#5c472b}
+:root[data-theme="light"][data-accent="rose"]{--green:#a12650;--green-dark:#831d40;--lime:#ffe1ea;--accent:var(--green);--accent-soft:#fbe8ee;--accent-hover:#fbe8ee;--accent-ink:#a12650;--accent-line:#efcbd7}
+:root[data-theme="dark"][data-accent="rose"]{--green:#ff9fba;--green-dark:#963150;--lime:#ffdce6;--accent:var(--green);--accent-soft:#3c252d;--accent-hover:#3c252d;--accent-ink:#ffc2d1;--accent-line:#65404b}
+:root[data-theme="light"][data-accent="teal"]{--green:#0d756e;--green-dark:#07564f;--lime:#d7f3ef;--accent:var(--green);--accent-soft:#e0f3f0;--accent-hover:#e0f3f0;--accent-ink:#0d756e;--accent-line:#c2e3df}
+:root[data-theme="dark"][data-accent="teal"]{--green:#67d9cb;--green-dark:#146d67;--lime:#c5fff4;--accent:var(--green);--accent-soft:#1d3435;--accent-hover:#1d3435;--accent-ink:#a4eee4;--accent-line:#365b5a}
+:root[data-theme="light"][data-accent="cyan"]{--green:#096a91;--green-dark:#08516e;--lime:#d8f5ff;--accent:var(--green);--accent-soft:#e0f5fb;--accent-hover:#e0f5fb;--accent-ink:#096a91;--accent-line:#c5e8f3}
+:root[data-theme="dark"][data-accent="cyan"]{--green:#75d9ff;--green-dark:#135a79;--lime:#d2f4ff;--accent:var(--green);--accent-soft:#1c303a;--accent-hover:#1c303a;--accent-ink:#b6ecff;--accent-line:#365667}
+:root[data-theme="light"][data-accent="coral"]{--green:#b54130;--green-dark:#8d3024;--lime:#ffe2dc;--accent:var(--green);--accent-soft:#fde9e5;--accent-hover:#fde9e5;--accent-ink:#b54130;--accent-line:#f0ccc4}
+:root[data-theme="dark"][data-accent="coral"]{--green:#ffab9b;--green-dark:#a23f31;--lime:#ffe0d9;--accent:var(--green);--accent-soft:#3b2928;--accent-hover:#3b2928;--accent-ink:#ffc7bc;--accent-line:#6a433f}
+
+/* Theme picker with a visible colour chip beside every option. */
+.accent-setting{margin:18px 0 6px}
+.theme-picker-label{display:block;font-size:11px;font-weight:800;margin-bottom:8px;color:var(--ink)}
+.theme-palette{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.theme-choice{display:flex;align-items:center;gap:9px;min-width:0;min-height:62px;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface-raised);color:var(--ink);text-align:left;cursor:pointer;transition:border-color .15s,background .15s,transform .15s;touch-action:manipulation}
+.theme-choice:hover{border-color:var(--green)!important;transform:translateY(-1px)}
+.theme-choice.selected{border-color:var(--green)!important;background:var(--accent-soft)!important;box-shadow:0 0 0 1px var(--green) inset}
+.theme-swatch{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:10px;background:var(--swatch);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.theme-swatch-dot{display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:rgba(255,255,255,.92);color:#17202b;font-size:12px;font-weight:900;opacity:0;transform:scale(.7);transition:opacity .15s,transform .15s}
+.theme-choice.selected .theme-swatch-dot{opacity:1;transform:scale(1)}
+.theme-choice-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.theme-choice-copy strong{font-size:11px;line-height:1.25;overflow-wrap:anywhere}
+.theme-choice-copy small{font-size:10px;color:var(--muted)}
+.theme-choice:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+@media(max-width:520px){.theme-palette{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.theme-choice{min-height:58px;padding:8px}.theme-swatch{width:30px;height:30px;flex-basis:30px}.theme-choice-copy strong{font-size:10px}}
+.theme-swatch-dot::before{content:"✓"}
+
+/* Higher-specificity surface reset: override earlier page-wide dark green declarations. */
+:root[data-theme="dark"] .sidebar,
+:root[data-theme="dark"] .panel,
+:root[data-theme="dark"] .stat,
+:root[data-theme="dark"] .search,
+:root[data-theme="dark"] .icon-btn,
+:root[data-theme="dark"] .field input,
+:root[data-theme="dark"] .field select,
+:root[data-theme="dark"] .field textarea,
+:root[data-theme="dark"] .input-search,
+:root[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] .parking-card,
+:root[data-theme="dark"] .result-card,
+:root[data-theme="dark"] .online-result,
+:root[data-theme="dark"] .report-panel,
+:root[data-theme="dark"] .auth-card {
+  background:var(--surface-raised)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:root[data-theme="light"] .sidebar,
+:root[data-theme="light"] .panel,
+:root[data-theme="light"] .stat,
+:root[data-theme="light"] .search,
+:root[data-theme="light"] .icon-btn,
+:root[data-theme="light"] .field input,
+:root[data-theme="light"] .field select,
+:root[data-theme="light"] .field textarea,
+:root[data-theme="light"] .input-search,
+:root[data-theme="light"] .parking-card,
+:root[data-theme="light"] .result-card,
+:root[data-theme="light"] .online-result,
+:root[data-theme="light"] .report-panel,
+:root[data-theme="light"] .auth-card {
+  background:var(--surface-raised)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:root[data-theme="dark"] .city-card,
+:root[data-theme="dark"] .mini-stat,
+:root[data-theme="dark"] .map-provider-row,
+:root[data-theme="dark"] .alert-banner,
+:root[data-theme="dark"] .secondary-btn {
+  background:var(--surface-muted)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:root[data-theme="light"] .city-card,
+:root[data-theme="light"] .mini-stat,
+:root[data-theme="light"] .map-provider-row,
+:root[data-theme="light"] .alert-banner,
+:root[data-theme="light"] .secondary-btn {
+  background:var(--surface-muted)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:root[data-theme="dark"] .welcome,
+:root[data-theme="light"] .welcome {background:var(--green-dark)!important;color:#fff!important}
+:root[data-theme="dark"] .welcome p,
+:root[data-theme="light"] .welcome p {color:rgba(255,255,255,.84)!important}
+:root[data-theme="dark"] .nav a:hover,
+:root[data-theme="dark"] .nav a.active,
+:root[data-theme="light"] .nav a:hover,
+:root[data-theme="light"] .nav a.active {background:var(--accent-hover)!important;color:var(--accent-ink)!important}
+:root[data-theme="dark"] .stat-icon,
+:root[data-theme="dark"] .stat-icon[style],
+:root[data-theme="dark"] .parking-icon,
+:root[data-theme="dark"] .vehicle-icon,
+:root[data-theme="dark"] .role-icon,
+:root[data-theme="dark"] .avatar,
+:root[data-theme="light"] .stat-icon,
+:root[data-theme="light"] .stat-icon[style],
+:root[data-theme="light"] .parking-icon,
+:root[data-theme="light"] .vehicle-icon,
+:root[data-theme="light"] .role-icon,
+:root[data-theme="light"] .avatar {
+  background:var(--accent-soft)!important;
+  color:var(--accent-ink)!important;
+  border-color:var(--accent-line)!important;
+}
+:root[data-theme="dark"] .pill.neutral,
+:root[data-theme="light"] .pill.neutral {background:var(--surface-muted)!important;color:var(--muted)!important;border-color:var(--line)!important}
+:root[data-theme="dark"] th,
+:root[data-theme="dark"] .field label,
+:root[data-theme="dark"] .nav-label {color:var(--muted)!important}

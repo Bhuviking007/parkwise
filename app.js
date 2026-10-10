@@ -4,10 +4,15 @@ function applyTheme(theme){
   try{localStorage.setItem('parkwise_theme',theme)}catch(e){}
 }
 function applyAccent(accent){
-  const allowed=['green','blue','purple','amber'];
+  const allowed=['green','blue','purple','amber','rose','teal','cyan','coral'];
   const value=allowed.includes(accent)?accent:'green';
   document.documentElement.setAttribute('data-accent',value);
   try{localStorage.setItem('parkwise_accent',value)}catch(e){}
+  document.querySelectorAll('[data-accent-choice]').forEach(button=>{
+    const selected=button.getAttribute('data-accent-choice')===value;
+    button.setAttribute('aria-checked',selected?'true':'false');
+    button.classList.toggle('selected',selected);
+  });
 }
 document.addEventListener('DOMContentLoaded',()=>{
   const themeToggle=document.getElementById('settingTheme');
@@ -132,7 +137,43 @@ function setupOnlineParking(){const form=document.getElementById('osmSearchForm'
 
 function setupParkingPage(){document.querySelectorAll('[data-park-filter]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-park-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderParking()}));document.getElementById('parkingSearch')?.addEventListener('input',renderParking);['parkingTypeFilter','parkingSort','parkingRadius'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderParking));const params=new URLSearchParams(location.search);const q=params.get('q');if(q&&document.getElementById('parkingSearch'))document.getElementById('parkingSearch').value=q;renderParking()}
 function setupReportForm(){const form=document.getElementById('reportForm');if(!form)return;form.addEventListener('submit',e=>{e.preventDefault();const type=document.getElementById('reportType').value,locationValue=document.getElementById('reportLocation').value.trim();if(!type||!locationValue){toast('Please choose an issue and add a location.');return}const reports=read(STORE.reports,[]);reports.push({id:'r'+Date.now(),type,location:locationValue,vehicle:document.getElementById('reportVehicle').value.trim(),priority:document.getElementById('reportPriority').value,details:document.getElementById('reportDetails').value.trim(),created:'Just now'});write(STORE.reports,reports);form.reset();renderCitizenReports();updateStats();toast('Report added to this demo. Thanks for helping your community!')});renderCitizenReports()}
-function setupSettings(){const form=document.getElementById('settingsForm');if(!form)return;const settings=read(STORE.settings,{notifications:true,compact:false});const accentSelect=document.getElementById('settingAccent');document.getElementById('settingNotifications').checked=!!settings.notifications;document.getElementById('settingCompact').checked=!!settings.compact;if(accentSelect){let accent='green';try{accent=localStorage.getItem('parkwise_accent')||'green'}catch(e){}accentSelect.value=accent;accentSelect.addEventListener('change',()=>{applyAccent(accentSelect.value);toast('Website colour theme updated.')})}form.addEventListener('submit',e=>{e.preventDefault();write(STORE.settings,{notifications:document.getElementById('settingNotifications').checked,compact:document.getElementById('settingCompact').checked});if(accentSelect)applyAccent(accentSelect.value);toast('Your preferences have been saved in this browser.')});document.getElementById('clearDemo')?.addEventListener('click',()=>{if(confirm('Clear demo reservations, reports, and resolved alerts from this browser?')){Object.values(STORE).forEach(k=>localStorage.removeItem(k));toast('Demo data cleared. Refreshing this page…');setTimeout(()=>location.reload(),650)}})}
+function setupSettings(){
+ const form=document.getElementById('settingsForm');
+ if(!form)return;
+ const settings=read(STORE.settings,{notifications:true,compact:false});
+ const choices=Array.from(document.querySelectorAll('[data-accent-choice]'));
+ document.getElementById('settingNotifications').checked=!!settings.notifications;
+ document.getElementById('settingCompact').checked=!!settings.compact;
+ let accent='green';
+ try{accent=localStorage.getItem('parkwise_accent')||'green'}catch(e){}
+ applyAccent(accent);
+ choices.forEach((button,index)=>{
+   button.addEventListener('click',()=>{
+     applyAccent(button.getAttribute('data-accent-choice'));
+     toast('Website colour theme updated.');
+   });
+   button.addEventListener('keydown',event=>{
+     if(!['ArrowRight','ArrowDown','ArrowLeft','ArrowUp'].includes(event.key))return;
+     event.preventDefault();
+     const direction=(event.key==='ArrowRight'||event.key==='ArrowDown')?1:-1;
+     const next=(index+direction+choices.length)%choices.length;
+     choices[next].focus();choices[next].click();
+   });
+ });
+ form.addEventListener('submit',e=>{
+   e.preventDefault();
+   write(STORE.settings,{notifications:document.getElementById('settingNotifications').checked,compact:document.getElementById('settingCompact').checked});
+   applyAccent(document.documentElement.getAttribute('data-accent')||accent);
+   toast('Your preferences have been saved in this browser.');
+ });
+ document.getElementById('clearDemo')?.addEventListener('click',()=>{
+   if(confirm('Clear demo reservations, reports, and resolved alerts from this browser?')){
+     Object.values(STORE).forEach(k=>localStorage.removeItem(k));
+     toast('Demo data cleared. Refreshing this page…');
+     setTimeout(()=>location.reload(),650);
+   }
+ });
+}
 
 const ROLE_STORE='parkwise_demo_profile_v1';
 const ROLE_CONFIG={
