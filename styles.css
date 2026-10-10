@@ -299,3 +299,124 @@
 :root[data-theme="dark"][data-accent="amber"] .nav a:hover,:root[data-theme="dark"][data-accent="amber"] .nav a.active{background:#42321e;color:#ffe2b3}
 .accent-setting{margin:18px 0 6px}.accent-setting select{width:100%;max-width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink)}.accent-setting .hint{display:block;margin-top:7px;line-height:1.5}
 #accountDirectoryPanel[hidden]{display:none!important}
+
+
+/* Theme consistency pass: use the selected accent for icon surfaces and controls,
+   including elements that previously had inline pastel background colors. */
+:root {
+  --surface-main:#ffffff;
+  --surface-raised:#ffffff;
+  --surface-muted:#f5f7f1;
+  --accent-soft:#eaf5eb;
+  --accent-hover:#eaf3eb;
+  --accent-ink:#32764d;
+  --accent-line:#d3e4d8;
+}
+:root[data-theme="dark"] {
+  --surface-main:#101813;
+  --surface-raised:#19251e;
+  --surface-muted:#223128;
+  --accent-soft:#223128;
+  --accent-hover:#263d2e;
+  --accent-ink:#b8edca;
+  --accent-line:#35493b;
+}
+:root[data-theme="light"][data-accent="blue"] {--accent-soft:#e7efff;--accent-hover:#e7efff;--accent-ink:#245bb5;--accent-line:#cbdaf8}
+:root[data-theme="dark"][data-accent="blue"] {--accent-soft:#20334e;--accent-hover:#20334e;--accent-ink:#c6dcff;--accent-line:#344b6a}
+:root[data-theme="light"][data-accent="purple"] {--accent-soft:#efe7fc;--accent-hover:#efe7fc;--accent-ink:#7041a6;--accent-line:#ded0f2}
+:root[data-theme="dark"][data-accent="purple"] {--accent-soft:#322544;--accent-hover:#322544;--accent-ink:#e0caff;--accent-line:#4b3764}
+:root[data-theme="light"][data-accent="amber"] {--accent-soft:#fff0d4;--accent-hover:#fff0d4;--accent-ink:#754507;--accent-line:#f0d8ad}
+:root[data-theme="dark"][data-accent="amber"] {--accent-soft:#42321e;--accent-hover:#42321e;--accent-ink:#ffe2b3;--accent-line:#5c472b}
+
+:root[data-theme="dark"] .stat-icon,
+:root[data-theme="dark"] .stat-icon[style],
+:root[data-theme="dark"] .parking-icon,
+:root[data-theme="dark"] .vehicle-icon,
+:root[data-theme="dark"] .role-icon,
+:root[data-theme="dark"] .avatar {
+  background:var(--accent-soft)!important;
+  color:var(--accent-ink)!important;
+  border-color:var(--accent-line)!important;
+}
+:root[data-theme="light"] .stat-icon,
+:root[data-theme="light"] .stat-icon[style],
+:root[data-theme="light"] .parking-icon,
+:root[data-theme="light"] .vehicle-icon,
+:root[data-theme="light"] .role-icon,
+:root[data-theme="light"] .avatar {
+  background:var(--accent-soft)!important;
+  color:var(--accent-ink)!important;
+  border-color:var(--accent-line)!important;
+}
+:root .nav a:hover,
+:root .nav a.active {background:var(--accent-hover)!important;color:var(--accent-ink)!important}
+:root .primary-btn,
+:root .welcome,
+:root .filter-chip.active {background:var(--green-dark)!important;border-color:var(--green-dark)!important}
+:root .text-btn,
+:root .brand-name span,
+:root .topbar h1 span,
+:root .eyebrow,
+:root .field input:focus,
+:root .field select:focus,
+:root .field textarea:focus {accent-color:var(--green);}
+:root .pill:not(.warn):not(.danger):not(.neutral) {background:var(--accent-soft);color:var(--accent-ink)}
+:root .toggle {accent-color:var(--green-dark)}
+:root .role-card {background:var(--surface-raised);border-color:var(--line)}
+:root .secondary-btn {background:var(--surface-raised);color:var(--accent-ink);border-color:var(--line)}
+:root[data-theme="dark"] .positive {color:var(--green)!important}
+
+/* Mobile navigation: keep its trigger at the viewport's upper-left and above the
+   drawer; pad the drawer branding below it so the two never collide. */
+@media(max-width:720px){
+  .mobile-menu {
+    display:grid!important;position:fixed!important;top:12px;left:12px;
+    z-index:1002!important;width:42px;height:42px;flex:0 0 42px;
+    background:var(--surface-raised)!important;color:var(--ink)!important;
+    border:1px solid var(--line);box-shadow:0 3px 12px rgba(0,0,0,.18);
+    touch-action:manipulation;pointer-events:auto;
+  }
+  .topbar>div:first-child {padding-left:50px;}
+  .sidebar {z-index:1000!important;padding-top:66px!important;gap:17px!important;}
+  .sidebar-backdrop {z-index:999!important;touch-action:manipulation;}
+  .sidebar .city-card {display:none!important;}
+  .sidebar .side-bottom {margin-top:auto;flex-shrink:0;padding-bottom:8px;}
+  .sidebar .profile {
+    position:sticky;bottom:0;z-index:4;min-height:60px;
+    padding:12px 9px 8px!important;margin-top:10px;
+    background:var(--surface-raised);border-top:1px solid var(--line);
+    border-radius:12px;box-shadow:0 -6px 14px rgba(0,0,0,.08);
+  }
+  .sidebar .profile>div:last-of-type {min-width:0;flex:1;}
+  .sidebar .profile strong,.sidebar .profile small {display:block;max-width:100%;overflow-wrap:anywhere;white-space:normal;}
+  .sidebar .nav a,.sidebar>a:not(.brand) {min-height:42px;touch-action:manipulation;}
+  #accountDirectoryBody select,#accountDirectoryBody button {min-height:42px;touch-action:manipulation;}
+}
+.role-edit-control {display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:180px}
+.role-edit-control select {flex:1;min-width:130px;min-height:40px}
+.role-edit-control button {min-height:40px;white-space:nowrap}
+
+
+/* Ensure accent colors win over the previous page-specific dark-green rules. */
+:root .primary-btn,
+:root .welcome,
+:root .filter-chip.active {background:var(--green-dark)!important;border-color:var(--green-dark)!important}
+:root .welcome .eyebrow {color:var(--lime)!important}
+:root .welcome p {color:color-mix(in srgb, var(--ink) 10%, #ffffff 90%);}
+:root .brand-mark {background:var(--green-dark)!important;color:#fff!important}
+:root .positive {color:var(--green)!important}
+@media(max-width:720px){
+  .sidebar>.profile {position:relative!important;top:auto;bottom:auto;order:0;margin:0 0 8px!important;flex:0 0 auto;width:100%;}
+  .sidebar>.profile .avatar {flex:0 0 35px;}
+  .sidebar>.profile strong {font-size:13px;}
+  .sidebar .side-bottom {min-height:0;}
+  .mobile-menu {user-select:none;-webkit-user-select:none;}
+}
+
+.nav-account-links { margin-top:-16px; }
+.nav-account-links a {min-height:42px;touch-action:manipulation;}
+@media(max-width:720px){
+  .nav-account-links {margin-top:-7px;}
+  .nav-account-links a {padding:11px 13px;}
+  .accounts-layout button,.dashboard-grid button,.role-grid button {min-height:42px;touch-action:manipulation;}
+}
