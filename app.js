@@ -14,10 +14,24 @@ function applyAccent(accent){
     button.classList.toggle('selected',selected);
   });
 }
+function applySurfaceStyle(style){
+  const value=style==='neutral'?'neutral':'tinted';
+  document.documentElement.setAttribute('data-surface-style',value);
+  try{localStorage.setItem('parkwise_surface_style',value)}catch(e){}
+  document.querySelectorAll('[data-surface-choice]').forEach(button=>{
+    const selected=button.getAttribute('data-surface-choice')===value;
+    button.setAttribute('aria-checked',selected?'true':'false');
+    button.classList.toggle('selected',selected);
+  });
+}
 document.addEventListener('DOMContentLoaded',()=>{
   const themeToggle=document.getElementById('settingTheme');
   const current=(document.documentElement.getAttribute('data-theme')||'dark');
   if(themeToggle){themeToggle.checked=current==='dark';themeToggle.addEventListener('change',()=>{applyTheme(themeToggle.checked?'dark':'light');toast(themeToggle.checked?'Dark theme enabled':'Light theme enabled')})}
+  document.querySelectorAll('[data-accent-choice]').forEach(button=>button.addEventListener('click',()=>{applyAccent(button.dataset.accentChoice);toast(button.querySelector('strong')?.textContent+' selected')}));
+  applyAccent(document.documentElement.getAttribute('data-accent')||'green');
+  document.querySelectorAll('[data-surface-choice]').forEach(button=>button.addEventListener('click',()=>{applySurfaceStyle(button.dataset.surfaceChoice);toast(button.dataset.surfaceChoice==='tinted'?'Theme-tinted surfaces enabled':'Neutral surfaces enabled')}));
+  applySurfaceStyle(document.documentElement.getAttribute('data-surface-style')||'tinted');
 });
 
 const STORE={reports:'parkwise_reports_v1',resolved:'parkwise_resolved_v1',reservations:'parkwise_reservations_v1',settings:'parkwise_settings_v1'};
@@ -148,10 +162,6 @@ function setupSettings(){
  try{accent=localStorage.getItem('parkwise_accent')||'green'}catch(e){}
  applyAccent(accent);
  choices.forEach((button,index)=>{
-   button.addEventListener('click',()=>{
-     applyAccent(button.getAttribute('data-accent-choice'));
-     toast('Website colour theme updated.');
-   });
    button.addEventListener('keydown',event=>{
      if(!['ArrowRight','ArrowDown','ArrowLeft','ArrowUp'].includes(event.key))return;
      event.preventDefault();

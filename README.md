@@ -122,3 +122,6 @@ Public Parkwise pages do not redirect visitors to the login screen. Visitors can
 
 ## Hardcoded demo admin (requested)
 The Netlify Function contains a demo admin username/email/password and a session-signing secret, so the demo can be tested without setting those environment variables. Login is still manual. These values are inside server-side Function code, not frontend browser JS. However, if the GitHub repository is public, anyone can read the credentials and signing secret from the source. This is demo-only and must not be used for real admin data or production privileges. Change them before public use.
+
+
+Recent update: Settings now offers Theme-tinted surfaces (default) and Neutral surfaces. Theme-tinted mode adjusts the card/background tint to match each accent; Neutral surfaces keeps a charcoal/slate dark appearance. Account creation now requires matching password confirmation and includes accessible show/hide eye buttons on password fields. The server validates password confirmation too.
