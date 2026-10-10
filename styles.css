@@ -258,24 +258,25 @@
   color: #17251f !important;
 }
 
-
-/* Mobile layout and navigation drawer fixes (Oct 2026). */
-@media (max-width: 720px) {
-  .dashboard-grid, .bottom-grid { grid-template-columns: minmax(0, 1fr) !important; }
-  .dashboard-grid > *, .bottom-grid > * { min-width: 0; width: 100%; }
-  .app { min-width: 0; overflow-x: clip; }
-  .main { min-width: 0; width: 100%; overflow-x: clip; }
-  .panel, .stat, .parking-card { min-width: 0; max-width: 100%; }
-  .panel-head { flex-wrap: wrap; }
-  .topbar { min-width: 0; }
-  .topbar > div:first-child { min-width: 0; flex: 1 1 auto; }
-  .topbar h1 { overflow-wrap: anywhere; }
-  .mobile-menu { flex: 0 0 42px; position: relative; z-index: 52; touch-action: manipulation; }
-  .sidebar { width: min(86vw, 320px); max-width: 100vw; overflow-y: auto; overscroll-behavior: contain; z-index: 60; padding-bottom: max(26px, env(safe-area-inset-bottom)); }
-  .sidebar.open { transform: translateX(0); }
-  .nav a { min-height: 46px; }
-  body.menu-open { overflow: hidden; }
-  .menu-backdrop { display: block; position: fixed; inset: 0; z-index: 55; border: 0; padding: 0; background: rgba(0,0,0,.48); opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s; }
-  .menu-backdrop.visible { opacity: 1; visibility: visible; }
+/* Reliable mobile drawer and responsive page grids (accounts/settings included). */
+.sidebar-backdrop{display:block;position:fixed;inset:0;width:100%;height:100%;border:0;border-radius:0;background:rgba(0,0,0,.52);opacity:0;visibility:hidden;z-index:29;transition:opacity .2s,visibility .2s;padding:0;margin:0}
+.sidebar-backdrop[hidden]{display:none!important}
+.sidebar-backdrop.visible{opacity:1;visibility:visible}
+@media(max-width:720px){
+  .sidebar{z-index:31;width:min( min(86vw,320px), 320px);max-width:86vw;overflow-y:auto;overscroll-behavior:contain;}
+  .sidebar.open{transform:translateX(0);pointer-events:auto}
+  .sidebar .nav a,.sidebar a{touch-action:manipulation}
+  .app,.main{min-width:0;width:100%;max-width:100%;}
+  .main{overflow-x:clip;}
+  .dashboard-grid,.bottom-grid{grid-template-columns:minmax(0,1fr)!important;width:100%;min-width:0;}
+  .dashboard-grid>.panel,.bottom-grid>.panel{grid-column:1/-1;min-width:0;width:100%;}
+  .dashboard-grid[style],.bottom-grid[style]{grid-template-columns:minmax(0,1fr)!important;}
+  .panel,.page-intro,.topbar,.topbar>div{min-width:0;max-width:100%;}
+  .topbar{gap:8px;}
+  .topbar h1{overflow-wrap:anywhere;}
+  .mobile-menu{position:relative;z-index:32;flex:0 0 42px;touch-action:manipulation;}
+  body.menu-open{overflow:hidden;}
+  .role-grid{grid-template-columns:minmax(0,1fr)!important;}
+  #accountDirectoryPanel{margin-top:0!important;}
+  #accountDirectoryPanel table{min-width:620px;}
 }
-@media (min-width: 721px) { .menu-backdrop { display: none !important; } }
