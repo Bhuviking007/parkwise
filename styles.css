@@ -280,3 +280,22 @@
   #accountDirectoryPanel{margin-top:0!important;}
   #accountDirectoryPanel table{min-width:620px;}
 }
+
+
+/* User-selectable website accent themes (saved as data-accent on the document root). */
+:root[data-theme="light"][data-accent="blue"]{--green:#245bb5;--green-dark:#19458d;--lime:#dbe8ff;--accent:var(--green)}
+:root[data-theme="dark"][data-accent="blue"]{--green:#91baff;--green-dark:#2d65bd;--lime:#d5e4ff;--accent:var(--green)}
+:root[data-theme="light"][data-accent="purple"]{--green:#7041a6;--green-dark:#563087;--lime:#eee3ff;--accent:var(--green)}
+:root[data-theme="dark"][data-accent="purple"]{--green:#c8a8ff;--green-dark:#6841a3;--lime:#e6d7ff;--accent:var(--green)}
+:root[data-theme="light"][data-accent="amber"]{--green:#98600f;--green-dark:#754507;--lime:#ffedc8;--accent:var(--green)}
+:root[data-theme="dark"][data-accent="amber"]{--green:#ffd08a;--green-dark:#966018;--lime:#ffe5bd;--accent:var(--green)}
+:root[data-theme="light"] .welcome,:root[data-theme="light"] .primary-btn,:root[data-theme="light"] .filter-chip.active{background:var(--green-dark);border-color:var(--green-dark)}
+:root[data-theme="dark"] .welcome,:root[data-theme="dark"] .primary-btn,:root[data-theme="dark"] .filter-chip.active{background:var(--green-dark);border-color:var(--green-dark)}
+:root[data-theme="light"][data-accent="blue"] .nav a:hover,:root[data-theme="light"][data-accent="blue"] .nav a.active{background:#e7efff;color:#245bb5}
+:root[data-theme="dark"][data-accent="blue"] .nav a:hover,:root[data-theme="dark"][data-accent="blue"] .nav a.active{background:#20334e;color:#c6dcff}
+:root[data-theme="light"][data-accent="purple"] .nav a:hover,:root[data-theme="light"][data-accent="purple"] .nav a.active{background:#efe7fc;color:#7041a6}
+:root[data-theme="dark"][data-accent="purple"] .nav a:hover,:root[data-theme="dark"][data-accent="purple"] .nav a.active{background:#322544;color:#e0caff}
+:root[data-theme="light"][data-accent="amber"] .nav a:hover,:root[data-theme="light"][data-accent="amber"] .nav a.active{background:#fff0d4;color:#754507}
+:root[data-theme="dark"][data-accent="amber"] .nav a:hover,:root[data-theme="dark"][data-accent="amber"] .nav a.active{background:#42321e;color:#ffe2b3}
+.accent-setting{margin:18px 0 6px}.accent-setting select{width:100%;max-width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink)}.accent-setting .hint{display:block;margin-top:7px;line-height:1.5}
+#accountDirectoryPanel[hidden]{display:none!important}

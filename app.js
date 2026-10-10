@@ -3,6 +3,12 @@ function applyTheme(theme){
   document.documentElement.setAttribute('data-theme',theme);
   try{localStorage.setItem('parkwise_theme',theme)}catch(e){}
 }
+function applyAccent(accent){
+  const allowed=['green','blue','purple','amber'];
+  const value=allowed.includes(accent)?accent:'green';
+  document.documentElement.setAttribute('data-accent',value);
+  try{localStorage.setItem('parkwise_accent',value)}catch(e){}
+}
 document.addEventListener('DOMContentLoaded',()=>{
   const themeToggle=document.getElementById('settingTheme');
   const current=(document.documentElement.getAttribute('data-theme')||'dark');
@@ -126,7 +132,7 @@ function setupOnlineParking(){const form=document.getElementById('osmSearchForm'
 
 function setupParkingPage(){document.querySelectorAll('[data-park-filter]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-park-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderParking()}));document.getElementById('parkingSearch')?.addEventListener('input',renderParking);['parkingTypeFilter','parkingSort','parkingRadius'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderParking));const params=new URLSearchParams(location.search);const q=params.get('q');if(q&&document.getElementById('parkingSearch'))document.getElementById('parkingSearch').value=q;renderParking()}
 function setupReportForm(){const form=document.getElementById('reportForm');if(!form)return;form.addEventListener('submit',e=>{e.preventDefault();const type=document.getElementById('reportType').value,locationValue=document.getElementById('reportLocation').value.trim();if(!type||!locationValue){toast('Please choose an issue and add a location.');return}const reports=read(STORE.reports,[]);reports.push({id:'r'+Date.now(),type,location:locationValue,vehicle:document.getElementById('reportVehicle').value.trim(),priority:document.getElementById('reportPriority').value,details:document.getElementById('reportDetails').value.trim(),created:'Just now'});write(STORE.reports,reports);form.reset();renderCitizenReports();updateStats();toast('Report added to this demo. Thanks for helping your community!')});renderCitizenReports()}
-function setupSettings(){const form=document.getElementById('settingsForm');if(!form)return;const settings=read(STORE.settings,{notifications:true,compact:false});document.getElementById('settingNotifications').checked=!!settings.notifications;document.getElementById('settingCompact').checked=!!settings.compact;form.addEventListener('submit',e=>{e.preventDefault();write(STORE.settings,{notifications:document.getElementById('settingNotifications').checked,compact:document.getElementById('settingCompact').checked});toast('Your demo preferences have been saved in this browser.')});document.getElementById('clearDemo')?.addEventListener('click',()=>{if(confirm('Clear demo reservations, reports, and resolved alerts from this browser?')){Object.values(STORE).forEach(k=>localStorage.removeItem(k));toast('Demo data cleared. Refreshing this page…');setTimeout(()=>location.reload(),650)}})}
+function setupSettings(){const form=document.getElementById('settingsForm');if(!form)return;const settings=read(STORE.settings,{notifications:true,compact:false});const accentSelect=document.getElementById('settingAccent');document.getElementById('settingNotifications').checked=!!settings.notifications;document.getElementById('settingCompact').checked=!!settings.compact;if(accentSelect){let accent='green';try{accent=localStorage.getItem('parkwise_accent')||'green'}catch(e){}accentSelect.value=accent;accentSelect.addEventListener('change',()=>{applyAccent(accentSelect.value);toast('Website colour theme updated.')})}form.addEventListener('submit',e=>{e.preventDefault();write(STORE.settings,{notifications:document.getElementById('settingNotifications').checked,compact:document.getElementById('settingCompact').checked});if(accentSelect)applyAccent(accentSelect.value);toast('Your preferences have been saved in this browser.')});document.getElementById('clearDemo')?.addEventListener('click',()=>{if(confirm('Clear demo reservations, reports, and resolved alerts from this browser?')){Object.values(STORE).forEach(k=>localStorage.removeItem(k));toast('Demo data cleared. Refreshing this page…');setTimeout(()=>location.reload(),650)}})}
 
 const ROLE_STORE='parkwise_demo_profile_v1';
 const ROLE_CONFIG={
@@ -135,7 +141,7 @@ const ROLE_CONFIG={
  officer:{label:'Traffic Officer',name:'Traffic Officer Demo',avatar:'TO',pages:['overview','violations','reports','insights','settings','accounts'],permissions:['View traffic violation queue','Resolve demo violation alerts','Review citizen reports','View city insight summaries']},
  admin:{label:'Administrator',name:'Administrator Demo',avatar:'AD',pages:['overview','parking','violations','reports','insights','settings','accounts'],permissions:['Access all prototype pages','Review demo parking and reservation data','Manage demo violation/report statuses','Preview all role configurations']}
 };
-function getDemoProfile(){const saved=read(ROLE_STORE,{role:'citizen',name:'Citizen Demo'});return {role:ROLE_CONFIG[saved.role]?saved.role:'citizen',name:String(saved.name||'Citizen Demo').slice(0,60)}}
+function getDemoProfile(){const saved=read(ROLE_STORE,{role:'citizen',name:'Citizen Demo'});let storedName='';try{storedName=localStorage.getItem('parkwise_display_name')||''}catch(e){}return {role:ROLE_CONFIG[saved.role]?saved.role:'citizen',name:String(storedName||saved.name||'Citizen Demo').slice(0,60)}}
 function setupRoleAccess(){
  const profile=getDemoProfile(),cfg=ROLE_CONFIG[profile.role],page=document.body.dataset.page||'overview';
  document.querySelectorAll('.nav a[href]').forEach(a=>{const href=a.getAttribute('href')||'';const key=href.replace('.html','');if(ROLE_CONFIG[profile.role]&&!cfg.pages.includes(key)&&['index','parking','violations','reports','insights','settings','accounts'].includes(key)){a.style.display='none'}});
@@ -144,11 +150,17 @@ function setupRoleAccess(){
  document.querySelectorAll('[data-profile-avatar]').forEach(el=>el.textContent=cfg.avatar);
  if(!cfg.pages.includes(page)){location.replace(profile.role==='citizen'?'parking.html':profile.role==='operator'?'parking.html':profile.role==='officer'?'violations.html':'index.html');return}
  if(page==='accounts'){
-  const select=document.getElementById('roleSelect'),name=document.getElementById('displayName'),list=document.getElementById('permissionList');
-  if(select)select.value=profile.role;if(name)name.value=profile.name;
-  const draw=()=>{const c=ROLE_CONFIG[select.value];list.innerHTML=c.permissions.map(p=>`<div class="permission-item"><span class="permission-check">✓</span><span>${escapeHTML(p)}</span></div>`).join('')};
-  draw();select?.addEventListener('change',draw);
-  document.getElementById('saveRole')?.addEventListener('click',()=>{const role=select.value,displayName=(name.value.trim()||ROLE_CONFIG[role].name).slice(0,60);write(ROLE_STORE,{role,name:displayName});document.getElementById('roleStatus').textContent=`Saved ${ROLE_CONFIG[role].label} demo profile. Reloading pages with this role…`;location.reload()});
+  const name=document.getElementById('displayName'),list=document.getElementById('permissionList');
+  let savedName=profile.name;try{savedName=localStorage.getItem('parkwise_display_name')||profile.name}catch(e){}
+  if(name)name.value=savedName;
+  if(list){const c=ROLE_CONFIG[profile.role];list.innerHTML=c.permissions.map(p=>`<div class="permission-item"><span class="permission-check">✓</span><span>${escapeHTML(p)}</span></div>`).join('')}
+  document.getElementById('saveRole')?.addEventListener('click',()=>{
+   const displayName=(name?.value.trim()||profile.name).slice(0,60);
+   try{localStorage.setItem('parkwise_display_name',displayName);write(ROLE_STORE,{role:profile.role,name:displayName})}catch(e){}
+   document.querySelectorAll('[data-profile-name]').forEach(el=>el.textContent=displayName);
+   const status=document.getElementById('roleStatus');if(status)status.textContent='Profile name saved in this browser. Account roles can only be changed by an authorized administrator.';
+   toast('Profile saved.');
+  });
  }
 }
 

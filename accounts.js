@@ -12,22 +12,39 @@
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   async function init() {
     const msg = $('directoryMessage'), body = $('accountDirectoryBody'), identity = $('accountIdentity');
+    const panel = $('accountDirectoryPanel');
     if (!msg || !body || !identity) return;
+    if (panel) panel.hidden = true;
+    body.innerHTML = '';
     try {
       const me = await api('me');
-      if (!me.authenticated) { identity.textContent='You are browsing as a guest. Sign in to view your account ID and manage accounts.'; msg.textContent='Sign in with an Administrator or Test Administrator account to access the account directory.'; body.innerHTML=''; return; }
+      if (!me.authenticated || !me.user) {
+        identity.textContent = 'You are browsing as a guest. Sign in to view your account ID.';
+        return;
+      }
       const user = me.user;
       identity.innerHTML = `<strong>${escapeHtml(user.username || user.email)}</strong> · ${escapeHtml(roleName(user.role))} · Parkwise ID: <strong>${escapeHtml(user.userId || 'Assigning…')}</strong>`;
-      if (!['admin','administrator','test_administrator'].includes(user.role)) { msg.textContent='Your account can view its own ID, but only Administrators and the Test Administrator can change roles or view the full directory.'; body.innerHTML=''; return; }
+      const canManage = ['admin','administrator','test_administrator'].includes(String(user.role || '').toLowerCase());
+      if (!canManage) {
+        identity.insertAdjacentHTML('beforeend', '<p class="hint" style="margin-top:8px">The full account directory is available only to Administrators and the Test Administrator.</p>');
+        return;
+      }
+      // The endpoint independently enforces authorization. Keep the panel hidden until it succeeds.
       const data = await api('users');
-      msg.textContent=`${data.users.length} account(s). Role changes are checked by the server.`;
+      if (panel) panel.hidden = false;
+      msg.textContent = `${data.users.length} account(s). Role changes are checked by the server.`;
       body.innerHTML = data.users.map(u => `<tr style="border-top:1px solid var(--line,#26332d)"><td style="padding:10px;font-variant-numeric:tabular-nums">${escapeHtml(u.userId)}</td><td style="padding:10px">${escapeHtml(u.username)}<br><small>${escapeHtml(u.email)}</small></td><td style="padding:10px">${escapeHtml(roleName(u.role))}</td><td style="padding:10px">${u.role==='test_administrator' ? '<span class="hint">Protected</span>' : `<select data-user-id="${escapeHtml(u.userId)}" aria-label="Role for ${escapeHtml(u.username)}"><option value="citizen" ${u.role==='citizen'?'selected':''}>Citizen</option><option value="operator" ${u.role==='operator'?'selected':''}>Parking Operator</option><option value="officer" ${u.role==='officer'?'selected':''}>Traffic Officer</option><option value="admin" ${['admin','administrator'].includes(u.role)?'selected':''}>Administrator</option></select><button type="button" data-save-role="${escapeHtml(u.userId)}" class="secondary-btn" style="margin-left:6px">Save</button>`}</td></tr>`).join('');
       body.querySelectorAll('[data-save-role]').forEach(btn => btn.addEventListener('click', async () => {
-        const id=btn.dataset.saveRole, select=body.querySelector(`select[data-user-id="${id}"]`); btn.disabled=true; btn.textContent='Saving…';
+        const id=btn.dataset.saveRole, select=body.querySelector(`select[data-user-id="${id}"]`);
+        if (!select) return;
+        btn.disabled=true; btn.textContent='Saving…';
         try { await api('set-role','POST',{userId:id,role:select.value}); msg.textContent='Role updated successfully.'; await init(); }
         catch(e) { msg.textContent=e.message || 'Could not update role.'; btn.disabled=false; btn.textContent='Save'; }
       }));
-    } catch (e) { msg.textContent=e.message || 'Could not load account directory.'; identity.textContent='Could not load account details.'; }
+    } catch (e) {
+      if (panel) panel.hidden = true;
+      identity.textContent = 'Could not load account details.';
+    }
   }
   document.addEventListener('DOMContentLoaded', init);
 })();
