@@ -699,3 +699,20 @@
 @media(max-width:1120px){.settings-grid{grid-template-columns:minmax(0,1fr)!important}}
 @media(max-width:520px){.settings-grid{gap:14px}.theme-palette{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.theme-choice{padding:10px 9px;gap:8px;min-height:62px}.theme-swatch{width:30px;height:30px;flex-basis:30px}.theme-choice-copy strong{font-size:11px}.theme-choice-copy small{font-size:10px}}
 @media(max-width:380px){.theme-palette{grid-template-columns:minmax(0,1fr)}.theme-choice{min-height:58px;padding:10px 12px}.theme-swatch{width:34px;height:34px;flex-basis:34px}.theme-choice-copy strong{font-size:12px}.theme-choice-copy small{font-size:11px}}
+
+
+/* More themes are displayed inline on Settings (never inside a dropdown). */
+.more-themes{margin:16px 0 6px;padding:14px 0 4px;border-top:1px solid var(--line)}
+.more-themes-heading{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.more-themes-heading strong{font-size:12px;color:var(--ink)}
+.more-themes-heading span{font-size:10px;line-height:1.4;color:var(--muted)}
+.more-theme-palette{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.more-theme-palette>.theme-choice,.custom-theme-tile{min-width:0;width:100%;}
+.custom-theme-tile{display:flex;flex-direction:column;gap:7px;border:1px solid var(--line);border-radius:12px;padding:7px;background:var(--surface-raised)}
+.custom-theme-tile .custom-theme-trigger{border:0;background:transparent;min-height:46px;padding:4px;box-shadow:none;transform:none}
+.custom-theme-tile .custom-theme-trigger.selected{background:var(--accent-soft)!important;box-shadow:0 0 0 1px var(--green) inset;border-radius:8px}
+.custom-colour-control{display:flex;align-items:center;gap:6px;border-top:1px solid var(--line);padding:7px 3px 1px;min-width:0;font-size:10px;color:var(--muted)}
+.custom-colour-control input[type=color]{width:30px;height:28px;min-width:30px;padding:2px;border:1px solid var(--line);border-radius:7px;background:var(--surface-muted);cursor:pointer}
+.custom-colour-control code{font-size:10px;color:var(--ink);margin-left:auto}
+@media(max-width:520px){.more-theme-palette{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.custom-colour-control{gap:4px}.custom-colour-control span{font-size:9px}}
+@media(max-width:360px){.more-theme-palette{grid-template-columns:minmax(0,1fr)}}

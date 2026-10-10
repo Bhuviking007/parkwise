@@ -2,17 +2,71 @@
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme',theme);
   try{localStorage.setItem('parkwise_theme',theme)}catch(e){}
+  const accent=document.documentElement.getAttribute('data-accent')||'green';
+  if(typeof applyAccent==='function')applyAccent(accent);
+}
+function hexToRgb(hex){
+  let value=String(hex||'').replace('#','').trim();
+  if(/^[0-9a-f]{3}$/i.test(value))value=value.split('').map(c=>c+c).join('');
+  if(!/^[0-9a-f]{6}$/i.test(value))return {r:224,g:91,b:67};
+  return {r:parseInt(value.slice(0,2),16),g:parseInt(value.slice(2,4),16),b:parseInt(value.slice(4,6),16)};
+}
+function rgbHex({r,g,b}){return '#'+[r,g,b].map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join('');}
+function mixHex(first,second,weight){
+  const a=hexToRgb(first),b=hexToRgb(second);
+  return rgbHex({r:a.r+(b.r-a.r)*weight,g:a.g+(b.g-a.g)*weight,b:a.b+(b.b-a.b)*weight});
+}
+const PARKWISE_ACCENTS={green:'#28734d',blue:'#2d65bd',purple:'#6841a3',amber:'#966018',rose:'#b72c5d',teal:'#0e8278',cyan:'#087eae',coral:'#b94a37',silver:'#7f8c9f',gold:'#c99a16',charcoal:'#626b7a'};
+function refreshThemeTokens(accentHex){
+  const root=document.documentElement, dark=(root.getAttribute('data-theme')||'dark')==='dark';
+  const surfaceStyle=root.getAttribute('data-surface-style')||'tinted';
+  const base=accentHex||PARKWISE_ACCENTS.green;
+  const mainBase=dark?'#111319':'#f5f6f8';
+  const raisedBase=dark?'#1c2028':'#ffffff';
+  const mutedBase=dark?'#252a34':'#eff1f5';
+  const strongBase=dark?'#2d333e':'#e5e8ee';
+  const lineBase=dark?'#343945':'#dfe3e9';
+  const accentText=dark?mixHex(base,'#ffffff',0.52):mixHex(base,'#000000',0.28);
+  const buttonColor=dark?mixHex(base,'#000000',0.10):mixHex(base,'#000000',0.22);
+  const set=(key,value)=>root.style.setProperty(key,value);
+  set('--green',accentText);set('--green-dark',buttonColor);set('--lime',mixHex(base,'#ffffff',0.77));set('--accent',accentText);
+  set('--accent-soft',mixHex(dark?'#111319':'#ffffff',base,dark?0.24:0.12));
+  set('--accent-hover',mixHex(dark?'#111319':'#ffffff',base,dark?0.28:0.15));
+  set('--accent-ink',dark?mixHex(base,'#ffffff',0.60):mixHex(base,'#000000',0.30));
+  set('--accent-line',mixHex(lineBase,base,dark?0.42:0.35));
+  if(surfaceStyle==='neutral'){
+    set('--surface-main',dark?'#111319':'#f5f6f8');set('--surface-raised',dark?'#1c2028':'#ffffff');
+    set('--surface-muted',dark?'#252a34':'#eff1f5');set('--surface-strong',dark?'#2d333e':'#e5e8ee');set('--line',lineBase);
+  }else{
+    set('--surface-main',mixHex(mainBase,base,dark?0.07:0.035));
+    set('--surface-raised',mixHex(raisedBase,base,dark?0.13:0.018));
+    set('--surface-muted',mixHex(mutedBase,base,dark?0.22:0.10));
+    set('--surface-strong',mixHex(strongBase,base,dark?0.26:0.15));
+    set('--line',mixHex(lineBase,base,dark?0.30:0.19));
+  }
 }
 function applyAccent(accent){
-  const allowed=['green','blue','purple','amber','rose','teal','cyan','coral'];
-  const value=allowed.includes(accent)?accent:'green';
+  const known=[...Object.keys(PARKWISE_ACCENTS),'custom'];
+  const value=known.includes(accent)?accent:'green';
+  let custom='#e05b43';
+  try{custom=localStorage.getItem('parkwise_custom_accent')||custom}catch(e){}
+  if(!/^#[0-9a-f]{6}$/i.test(custom))custom='#e05b43';
+  const hex=value==='custom'?custom:PARKWISE_ACCENTS[value];
   document.documentElement.setAttribute('data-accent',value);
+  document.documentElement.style.setProperty('--custom-accent',hex);
   try{localStorage.setItem('parkwise_accent',value)}catch(e){}
+  refreshThemeTokens(hex);
   document.querySelectorAll('[data-accent-choice]').forEach(button=>{
     const selected=button.getAttribute('data-accent-choice')===value;
     button.setAttribute('aria-checked',selected?'true':'false');
     button.classList.toggle('selected',selected);
   });
+  const picker=document.getElementById('customAccentColor');
+  const hexLabel=document.getElementById('customAccentHex');
+  const swatch=document.getElementById('customThemeSwatch');
+  if(picker&&picker.value.toLowerCase()!==custom.toLowerCase())picker.value=custom;
+  if(hexLabel)hexLabel.textContent=custom.toUpperCase();
+  if(swatch)swatch.style.setProperty('--swatch',custom);
 }
 function applySurfaceStyle(style){
   const value=style==='neutral'?'neutral':'tinted';
@@ -23,12 +77,27 @@ function applySurfaceStyle(style){
     button.setAttribute('aria-checked',selected?'true':'false');
     button.classList.toggle('selected',selected);
   });
+  const accent=document.documentElement.getAttribute('data-accent')||'green';
+  let hex=PARKWISE_ACCENTS[accent]||PARKWISE_ACCENTS.green;
+  if(accent==='custom'){try{hex=localStorage.getItem('parkwise_custom_accent')||'#e05b43'}catch(e){hex='#e05b43'}}
+  refreshThemeTokens(hex);
 }
 document.addEventListener('DOMContentLoaded',()=>{
   const themeToggle=document.getElementById('settingTheme');
   const current=(document.documentElement.getAttribute('data-theme')||'dark');
   if(themeToggle){themeToggle.checked=current==='dark';themeToggle.addEventListener('change',()=>{applyTheme(themeToggle.checked?'dark':'light');toast(themeToggle.checked?'Dark theme enabled':'Light theme enabled')})}
-  document.querySelectorAll('[data-accent-choice]').forEach(button=>button.addEventListener('click',()=>{applyAccent(button.dataset.accentChoice);toast(button.querySelector('strong')?.textContent+' selected')}));
+  document.querySelectorAll('[data-accent-choice]').forEach(button=>button.addEventListener('click',()=>{
+    const next=button.dataset.accentChoice;
+    if(next==='charcoal'){
+      if(themeToggle)themeToggle.checked=true;
+      applyTheme('dark');applySurfaceStyle('neutral');
+    }
+    applyAccent(next);
+    toast(button.querySelector('strong')?.textContent+' selected');
+  }));
+  const customPicker=document.getElementById('customAccentColor');
+  let storedCustom='#e05b43';try{storedCustom=localStorage.getItem('parkwise_custom_accent')||storedCustom}catch(e){}
+  if(customPicker){customPicker.value=storedCustom;customPicker.addEventListener('input',()=>{try{localStorage.setItem('parkwise_custom_accent',customPicker.value)}catch(e){}applyAccent('custom')});}
   applyAccent(document.documentElement.getAttribute('data-accent')||'green');
   document.querySelectorAll('[data-surface-choice]').forEach(button=>button.addEventListener('click',()=>{applySurfaceStyle(button.dataset.surfaceChoice);toast(button.dataset.surfaceChoice==='tinted'?'Theme-tinted surfaces enabled':'Neutral surfaces enabled')}));
   applySurfaceStyle(document.documentElement.getAttribute('data-surface-style')||'tinted');
