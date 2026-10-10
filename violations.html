@@ -1,13 +1,16 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#226a4d"><title>Violations — Parkwise</title><script>
-(function(){
-  try {
-    var saved=localStorage.getItem('parkwise_theme');
-    var theme=saved || 'dark';
-    document.documentElement.setAttribute('data-theme',theme);
-    document.documentElement.setAttribute('data-accent',localStorage.getItem('parkwise_accent')||'green');document.documentElement.setAttribute('data-surface-style',localStorage.getItem('parkwise_surface_style')||'tinted');
-  } catch(e) { document.documentElement.setAttribute('data-theme','dark'); }
-})();
-</script>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#226a4d"><title>Violations — Parkwise</title><script>(function(){
+  var root=document.documentElement;
+  try{
+    root.setAttribute('data-theme',localStorage.getItem('parkwise_theme')||'dark');
+    var accent=localStorage.getItem('parkwise_accent')||'green';
+    root.setAttribute('data-accent',accent);
+    root.setAttribute('data-surface-style',localStorage.getItem('parkwise_surface_style')||'tinted');
+    var custom=localStorage.getItem('parkwise_custom_accent')||'#e05b43';
+    root.style.setProperty('--custom-accent',custom);
+    // Match the RGB phase to wall-clock time so reloading never restarts at red.
+    if(accent==='rgb')root.style.setProperty('--parkwise-rgb-hue',((Date.now()%30000)/30000*360).toFixed(2)+'deg');
+  }catch(e){root.setAttribute('data-theme','dark');root.setAttribute('data-accent','green');root.setAttribute('data-surface-style','tinted');}
+})();</script>
 <link rel="stylesheet" href="styles.css"></head><body data-page="violations"><div class="app">
 <aside class="sidebar" id="sidebar"><a class="brand" href="index.html"><div class="brand-mark">P</div><div class="brand-name">park<span>wise</span></div></a><div class="nav-label">WORKSPACE</div><nav class="nav">
 <a class="" href="index.html"><span class="ico">▦</span> Overview</a><a class="" href="parking.html"><span class="ico">⌖</span> Find parking</a><a class="active" href="violations.html"><span class="ico">◉</span> Violations <span class="nav-count" data-stat="violations">03</span></a><a class="" href="reports.html"><span class="ico">＋</span> Citizen reports</a><a class="" href="insights.html"><span class="ico">▥</span> City insights</a></nav>

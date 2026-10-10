@@ -17,6 +17,29 @@ function mixHex(first,second,weight){
   return rgbHex({r:a.r+(b.r-a.r)*weight,g:a.g+(b.g-a.g)*weight,b:a.b+(b.b-a.b)*weight});
 }
 const PARKWISE_ACCENTS={green:'#28734d',blue:'#2d65bd',purple:'#6841a3',amber:'#966018',rose:'#b72c5d',teal:'#0e8278',cyan:'#087eae',coral:'#b94a37',silver:'#7f8c9f',gold:'#c99a16',rgb:'#31d6c9'};
+let parkwiseRgbAnimationFrame = null;
+function syncRgbSpectrum(accent){
+  const root=document.documentElement;
+  if(parkwiseRgbAnimationFrame!==null){cancelAnimationFrame(parkwiseRgbAnimationFrame);parkwiseRgbAnimationFrame=null;}
+  if(accent!=='rgb'){
+    root.style.removeProperty('--parkwise-rgb-hue');
+    return;
+  }
+  // Anchor hue to wall-clock time, not the page-load animation start. This keeps
+  // RGB moving seamlessly across refreshes and page navigation.
+  const update=()=>{
+    if(root.getAttribute('data-accent')!=='rgb'){
+      parkwiseRgbAnimationFrame=null;
+      root.style.removeProperty('--parkwise-rgb-hue');
+      return;
+    }
+    const hue=((Date.now()%30000)/30000)*360;
+    root.style.setProperty('--parkwise-rgb-hue',hue.toFixed(2)+'deg');
+    parkwiseRgbAnimationFrame=requestAnimationFrame(update);
+  };
+  root.style.setProperty('--parkwise-rgb-hue',(((Date.now()%30000)/30000)*360).toFixed(2)+'deg');
+  parkwiseRgbAnimationFrame=requestAnimationFrame(update);
+}
 function refreshThemeTokens(accentHex){
   const root=document.documentElement, dark=(root.getAttribute('data-theme')||'dark')==='dark';
   const surfaceStyle=root.getAttribute('data-surface-style')||'tinted';
@@ -77,7 +100,8 @@ function applyAccent(accent){
   const hex=value==='custom'?custom:PARKWISE_ACCENTS[value];
   document.documentElement.setAttribute('data-accent',value);
   document.documentElement.style.setProperty('--custom-accent',hex);
-  try{localStorage.setItem('parkwise_accent',value)}catch(e){}
+  try{localStorage.setItem('parkwise_accent',value);localStorage.setItem('parkwise_custom_accent',custom)}catch(e){}
+  syncRgbSpectrum(value);
   refreshThemeTokens(hex);
   document.querySelectorAll('[data-accent-choice]').forEach(button=>{
     const selected=button.getAttribute('data-accent-choice')===value;
@@ -117,7 +141,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   const customPicker=document.getElementById('customAccentColor');
   let storedCustom='#e05b43';try{storedCustom=localStorage.getItem('parkwise_custom_accent')||storedCustom}catch(e){}
   if(customPicker){customPicker.value=storedCustom;customPicker.addEventListener('input',()=>{try{localStorage.setItem('parkwise_custom_accent',customPicker.value)}catch(e){}applyAccent('custom')});}
-  applyAccent(document.documentElement.getAttribute('data-accent')||'green');
+  let savedAccent='green';try{savedAccent=localStorage.getItem('parkwise_accent')||document.documentElement.getAttribute('data-accent')||'green'}catch(e){savedAccent=document.documentElement.getAttribute('data-accent')||'green'}
+  applyAccent(savedAccent);
   document.querySelectorAll('[data-surface-choice]').forEach(button=>button.addEventListener('click',()=>{applySurfaceStyle(button.dataset.surfaceChoice);toast(button.dataset.surfaceChoice==='tinted'?'Theme-tinted surfaces enabled':'Neutral surfaces enabled')}));
   applySurfaceStyle(document.documentElement.getAttribute('data-surface-style')||'tinted');
 });
@@ -304,3 +329,8 @@ function setupRoleAccess(){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{setupRoleAccess();setupShell();setupDashboard();if(document.body.dataset.page==='parking'){setupParkingPage();setupOnlineParking();}if(document.body.dataset.page==='violations')setupViolationFilters();if(document.body.dataset.page==='reports')setupReportForm();if(document.body.dataset.page==='settings')setupSettings();});
+
+// Keep the rainbow phase aligned with real time when returning to a background tab.
+document.addEventListener('visibilitychange',()=>{
+  if(document.documentElement.getAttribute('data-accent')==='rgb'&&!document.hidden)syncRgbSpectrum('rgb');
+});
